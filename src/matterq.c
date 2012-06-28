@@ -59,6 +59,7 @@ int spool(const char *queue, const char *filename) {
     size_t nb;
 
     int job = 0;
+    char *sfile = NULL;
 
     if (strcmp(filename, "-") == 0)
         stream = stdin;
@@ -68,8 +69,19 @@ int spool(const char *queue, const char *filename) {
     job = next_job_id(queue);
     printf("job: %d\n", job);
 
-    // TODO allocate job id and use correct file name
-    spool = fopen("/tmp/opstest/testdump", "w");
+    if (chdir(getenv("OPSQUEUEDIR")) != 0) {
+        fprintf(stderr, "bad queue path\n");
+        return -1;
+    }
+
+    if (chdir(queue) != 0) {
+        fprintf(stderr, "bad queue path\n");
+        return -1;
+    }
+
+    asprintf(&sfile, "%u:%u:%s", job, 1, "No Name");
+    spool = fopen(sfile, "w");
+    free(sfile);
 
     // TODO checks and flushes
     while ((nb = fread(buffer, sizeof(char), BUF_SIZE, stream)) > 0) {
