@@ -10,6 +10,47 @@
 #include "matterq.h"
 
 
+int next_job_id(const char *queue) {
+    DIR *dp = NULL;
+    struct dirent *ep = NULL;
+
+    unsigned int job = 0;
+    int na = 0;
+
+    unsigned int max = 0;
+
+    if (chdir(getenv("OPSQUEUEDIR")) != 0) {
+        fprintf(stderr, "bad queue path\n");
+        return -1;
+    }
+
+    dp = opendir(queue);
+    if (dp == NULL) {
+        fprintf(stderr, "queue %s does not exist\n", queue);
+        return -1;
+    }
+
+    while ((ep = readdir(dp))) {
+        if (ignore(ep->d_name) == TRUE)
+            continue;
+
+        na = sscanf(ep->d_name, "%u:", &job);
+
+        if (na != 1) {
+            fprintf(stderr, "bad job: %s\n", ep->d_name);
+            return -1;
+        }
+
+        if (job > max)
+            max = job;
+    }
+
+    closedir(dp);
+
+    return max + 1;
+}
+
+
 int spool(const char *queue, const char *filename) {
     FILE *stream = NULL;
     FILE *spool = NULL;
@@ -17,10 +58,15 @@ int spool(const char *queue, const char *filename) {
     char *buffer[BUF_SIZE];
     size_t nb;
 
+    int job = 0;
+
     if (strcmp(filename, "-") == 0)
         stream = stdin;
 
     // TODO else open file
+
+    job = next_job_id(queue);
+    printf("job: %d\n", job);
 
     // TODO allocate job id and use correct file name
     spool = fopen("/tmp/opstest/testdump", "w");
