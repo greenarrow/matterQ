@@ -54,6 +54,12 @@ int list(const char *queue) {
     DIR *dp = NULL;
     struct dirent *ep = NULL;
 
+    unsigned int job = 0;
+    unsigned int priority = 0;
+    char name[256];
+    int na = 0;
+    int nb = 0;
+
     if (chdir(getenv("OPSQUEUEDIR")) != 0) {
         fprintf(stderr, "bad queue path\n");
         return -1;
@@ -66,8 +72,17 @@ int list(const char *queue) {
     }
 
     while ((ep = readdir(dp))) {
-        if (ignore(ep->d_name) == FALSE)
-           printf("%s\n", ep->d_name);
+        if (ignore(ep->d_name) == TRUE)
+            continue;
+
+        na = sscanf(ep->d_name, "%u:%u:%255[^\n]%n", &job, &priority, name, &nb);
+
+        if (na != 3 || nb != strlen(ep->d_name)) {
+            fprintf(stderr, "bad job: %s\n", ep->d_name);
+            return -1;
+        }
+
+        printf("job:\t\t%u\npriority:\t%u\nname:\t\t%s\n\n", job, priority, name);
     }
 
     closedir(dp);
