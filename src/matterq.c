@@ -32,15 +32,8 @@ int spool(const char *queue, const char *filename) {
     job = next_job_id(queue);
     printf("job: %d\n", job);
 
-    if (chdir(getenv("OPSQUEUEDIR")) != 0) {
-        fprintf(stderr, "bad queue path\n");
+    if (chqueue(queue) != 0)
         return -1;
-    }
-
-    if (chdir(queue) != 0) {
-        fprintf(stderr, "bad queue path\n");
-        return -1;
-    }
 
     asprintf(&sfile, "%u:%u:%s", job, 1, "No Name");
     spool = fopen(sfile, "w");
@@ -67,10 +60,8 @@ int list(const char *queue) {
     int na = 0;
     int nb = 0;
 
-    if (chdir(getenv("OPSQUEUEDIR")) != 0) {
-        fprintf(stderr, "bad queue path\n");
+    if (chqueue(NULL) != 0)
         return -1;
-    }
 
     dp = opendir(queue);
     if (dp == NULL) {

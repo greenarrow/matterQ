@@ -9,6 +9,28 @@
 #include "queue.h"
 
 
+int chqueue(const char *queue) {
+    int rc = 0;
+
+    rc = chdir(getenv("OPSQUEUEDIR"));
+    if (rc != 0) {
+        fprintf(stderr, "bad queue path\n");
+        return rc;
+    }
+
+    if (queue == NULL)
+        return rc;
+
+    rc = chdir(queue);
+    if (rc != 0) {
+        fprintf(stderr, "queue %s does not exist\n", queue);
+        return rc;
+    }
+
+    return rc;
+}
+
+
 int next_job_id(const char *queue) {
     DIR *dp = NULL;
     struct dirent *ep = NULL;
@@ -18,10 +40,8 @@ int next_job_id(const char *queue) {
 
     unsigned int max = 0;
 
-    if (chdir(getenv("OPSQUEUEDIR")) != 0) {
-        fprintf(stderr, "bad queue path\n");
+    if (chqueue(NULL) != 0)
         return -1;
-    }
 
     dp = opendir(queue);
     if (dp == NULL) {
