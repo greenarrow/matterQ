@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#echo DFC=$datafile_count > /tmp/fs
+#if [ "$datafile_count" -gt 1 ]; then
+#    echo "multiple data files not supported" >&2
+#    exit 2
+#fi
+
+source /etc/profile.d/austerusg.sh
+
+austerus-send -v $SPOOL_DIR/$DATAFILES
+#austerus-send -s -v $SPOOL_DIR/$DATAFILES
+
+if [ "$?" -eq 0 ]; then
+    exit 0
+else
+    exit 2
+fi
