@@ -33,12 +33,16 @@ config:
 wifi:
 	print "WiFi configuration"
 	$(INSTALL) -d $(DESTDIR)$(ETCDIR)/network
-	$(INSTALL) -m 0644 config/wpa.conf $(DESTDIR)$(ETCDIR)
+	$(INSTALL) -d $(DESTDIR)$(ETCDIR)/wpa_supplicant
+	$(INSTALL) -m 0644 config/wpa_supplicant/wpa_supplicant.conf \
+		$(DESTDIR)$(ETCDIR)/wpa_supplicant
 	$(INSTALL) -m 0644 config/interfaces $(DESTDIR)$(ETCDIR)/network
-	print "Now edit /etc/wpa.conf and enter your ssid and psk:"
-	print "  $ sudo vim /etc/wpa.conf"
+
+	print "Now edit /etc/wpa_supplicant/wpa_supplicant.conf and enter your ssid "
+	print "and psk:"
+	print "  $ sudo vim /etc/wpa_supplicant/wpa_supplicant.conf"
 	print "  OR"
-	print "  $ sudo nano /etc/wpa.conf"
+	print "  $ sudo nano /etc/wpa_supplicant/wpa_supplicant.conf"
 
 all: packages filter config
 
