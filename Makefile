@@ -32,11 +32,9 @@ config:
 
 wifi:
 	# WiFi configuration
-	$(INSTALL) -d $(DESTDIR)$(ETCDIR)/network
 	$(INSTALL) -d $(DESTDIR)$(ETCDIR)/wpa_supplicant
 	$(INSTALL) -m 0644 config/wpa_supplicant.conf \
 		$(DESTDIR)$(ETCDIR)/wpa_supplicant
-	$(INSTALL) -m 0644 config/interfaces $(DESTDIR)$(ETCDIR)/network
 
 	# Now edit $(DESTDIR)$(ETCDIR)/wpa_supplicant/wpa_supplicant.conf and enter
 	# your ssid and psk:
