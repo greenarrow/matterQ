@@ -38,11 +38,11 @@ wifi:
 		$(DESTDIR)$(ETCDIR)/wpa_supplicant
 	$(INSTALL) -m 0644 config/interfaces $(DESTDIR)$(ETCDIR)/network
 
-	# Now edit /etc/wpa_supplicant/wpa_supplicant.conf and enter your ssid
-	# and psk:
-	#  $ sudo vim /etc/wpa_supplicant/wpa_supplicant.conf
+	# Now edit $(DESTDIR)$(ETCDIR)/wpa_supplicant/wpa_supplicant.conf and enter
+	# your ssid and psk:
+	#  $ sudo vim $(DESTDIR)$(ETCDIR)/wpa_supplicant/wpa_supplicant.conf
 	#  OR
-	#  $ sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+	#  $ sudo nano $(DESTDIR)$(ETCDIR)/wpa_supplicant.conf
 
 all: packages filter config
 
