@@ -21,10 +21,12 @@ filter:
 config:
 	print "System configuration"
 	$(INSTALL) -d $(DESTDIR)$(ETCDIR)/lprng
+	$(INSTALL) -d $(DESTDIR)$(ETCDIR)/profile.d
 	$(INSTALL) -m 0644 config/printcap $(DESTDIR)$(ETCDIR)
 	$(INSTALL) -m 0644 config/lpd.conf $(DESTDIR)$(ETCDIR)/lprng
 	$(INSTALL) -m 0644 config/lpd.perms $(DESTDIR)$(ETCDIR)/lprng
-        
+	$(INSTALL) -m 0755 config/austerusg.sh $(DESTDIR)$(ETCDIR)/profile.d
+
 	usermod -a -G pi dialout
 	usermod -a -G daemon dialout
 
