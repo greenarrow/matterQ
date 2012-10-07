@@ -5,6 +5,8 @@ EXEDIR ?= $(PREFIX)/libexec
 ETCDIR ?= /etc
 TMPDIR ?= /tmp
 
+PIHOME ?= /home/pi
+
 INSTALL ?= install
 
 packages:
@@ -41,6 +43,29 @@ wifi:
 	#  $ sudo vim $(DESTDIR)$(ETCDIR)/wpa_supplicant/wpa_supplicant.conf
 	#  OR
 	#  $ sudo nano $(DESTDIR)$(ETCDIR)/wpa_supplicant.conf
+
+imageprune:
+	apt-get remove -y x11-common desktop-base gnome-icon-theme \
+		gnome-themes-standard gpicview python3 lxde-common \
+		lxde-icon-theme ttf-freefont fonts-freefont-ttf
+	apt-get autoremove -y
+	apt-get clean
+
+	rm -fR /opt/vc
+ 
+imageclean:
+	apt-get clean
+
+	rm -fR $(PIHOME)/.ssh $(PIHOME)/.aptitude $(PIHOME)/.byobu \
+		$(PIHOME)/python_games $(PIHOME)/.screenrc
+
+	dphys-swapfile swapoff
+	dd if=/dev/zero of=/var/swap bs=1M count=100
+	mkswap /var/swap
+
+	find /var/log -type f | xargs rm
+
+	rm -f $(PIHOME)/.bash_history
 
 install: filter sysconfig packages
 
