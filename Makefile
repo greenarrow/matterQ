@@ -29,6 +29,8 @@ sysconfig:
 	$(INSTALL) -m 0644 config/lpd.perms $(DESTDIR)$(ETCDIR)/lprng
 	$(INSTALL) -m 0755 config/austerusg.sh $(DESTDIR)$(ETCDIR)/profile.d
 
+	cp $(DESTDIR)$(BOOTDIR)/arm240_start.elf $(DESTDIR)$(BOOTDIR)/start.elf
+
 	usermod -a -G dialout pi
 	usermod -a -G dialout daemon
 
