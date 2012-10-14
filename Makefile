@@ -4,6 +4,7 @@ MANDIR ?= $(PREFIX)/share/man
 EXEDIR ?= $(PREFIX)/libexec
 ETCDIR ?= /etc
 TMPDIR ?= /tmp
+BOOTDIR ?= /boot
 
 PIHOME ?= /home/pi
 
@@ -27,7 +28,9 @@ sysconfig:
 	$(INSTALL) -m 0644 config/printcap $(DESTDIR)$(ETCDIR)
 	$(INSTALL) -m 0644 config/lpd.conf $(DESTDIR)$(ETCDIR)/lprng
 	$(INSTALL) -m 0644 config/lpd.perms $(DESTDIR)$(ETCDIR)/lprng
-	$(INSTALL) -m 0755 config/austerusg.sh $(DESTDIR)$(ETCDIR)/profile.d
+	$(INSTALL) -m 0755 config/austerusg.conf $(DESTDIR)$(BOOTDIR)
+	ln -sf $(DESTDIR)$(BOOTDIR)/austerusg.conf \
+		$(DESTDIR)$(ETCDIR)/profile.d
 
 	cp $(DESTDIR)$(BOOTDIR)/arm240_start.elf $(DESTDIR)$(BOOTDIR)/start.elf
 
