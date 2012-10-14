@@ -25,6 +25,7 @@ sysconfig:
 	# System configuration
 	$(INSTALL) -d $(DESTDIR)$(ETCDIR)/lprng
 	$(INSTALL) -d $(DESTDIR)$(ETCDIR)/profile.d
+	$(INSTALL) -d $(DESTDIR)$(BOOTDIR)
 	$(INSTALL) -m 0644 config/printcap $(DESTDIR)$(ETCDIR)
 	$(INSTALL) -m 0644 config/lpd.conf $(DESTDIR)$(ETCDIR)/lprng
 	$(INSTALL) -m 0644 config/lpd.perms $(DESTDIR)$(ETCDIR)/lprng
@@ -40,6 +41,7 @@ sysconfig:
 wifi:
 	# WiFi configuration
 	$(INSTALL) -d $(DESTDIR)$(ETCDIR)/wpa_supplicant
+	$(INSTALL) -d $(DESTDIR)$(BOOTDIR)
 	$(INSTALL) -m 0644 config/wifi.conf \
 		$(DESTDIR)$(BOOTDIR)
 	ln -sf $(DESTDIR)$(BOOTDIR)/wifi.conf \
