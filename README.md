@@ -35,6 +35,7 @@ into a function 3D print server.
 
 
 ### Customising the Raspbian Image
+Steps 1 to 5 are performed on the Raspberry Pi board after connecting by SSH.
 
 1.  Install Git
 
@@ -72,3 +73,20 @@ into a function 3D print server.
 5.  Shutdown
 
         $ sudo poweroff && exit
+
+6.  Creating Image & Clearing Free Space
+
+    To perform this step the SD card is removed from the Raspberry Pi and
+    inserted into a Linux computer.
+
+    **/dev/sdxx** is the device of the SD card.
+
+        $ umount /dev/sdxx1
+        $ umount /dev/sdxx2
+        $ sudo dd if=/dev/sdxx of=FILENAME.img count=3788800
+        $ sudo mkdir -p /mnt/tmp
+        $ sudo mount -o loop,offset=$((512*122880)) FILENAME.img /mnt/tmp
+        $ sudo sfill -z -l -l -f /mnt/tmp
+        $ sudo umount /mnt/tmp
+        $ zip FILENAME.zip FILENAME.img
+
