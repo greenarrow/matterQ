@@ -43,9 +43,12 @@ into a function 3D print server.
 
 2.  Install matterQ
 
+        $ cd ~
         $ git clone https://github.com/greenarrow/matterQ.git
         $ cd matterQ
-        $ sudo make install
+        $ sudo make packages
+        $ sudo make filter
+        $ sudo make sysconfig
 
     This step can be skipped if WiFi is not requied.
 
@@ -53,12 +56,19 @@ into a function 3D print server.
 
 3.  Install austerusG (latest stable version)
 
+        $ cd ~
         $ git clone https://github.com/greenarrow/austerusG.git
         $ cd austerusG
         $ git checkout `git describe --abbrev=0`
         $ make
         $ sudo make install
 
-5.  Restart server
+4.  Remove Packages and Clean Image
 
-        $ sudo reboot && exit
+        $ cd ~/matterQ
+        $ sudo make imageprune
+        $ sudo make imageclean
+
+5.  Shutdown
+
+        $ sudo poweroff && exit
