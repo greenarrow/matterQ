@@ -40,14 +40,10 @@ sysconfig:
 wifi:
 	# WiFi configuration
 	$(INSTALL) -d $(DESTDIR)$(ETCDIR)/wpa_supplicant
-	$(INSTALL) -m 0644 config/wpa_supplicant.conf \
-		$(DESTDIR)$(ETCDIR)/wpa_supplicant
-
-	# Now edit $(DESTDIR)$(ETCDIR)/wpa_supplicant/wpa_supplicant.conf and enter
-	# your ssid and psk:
-	#  $ sudo vim $(DESTDIR)$(ETCDIR)/wpa_supplicant/wpa_supplicant.conf
-	#  OR
-	#  $ sudo nano $(DESTDIR)$(ETCDIR)/wpa_supplicant.conf
+	$(INSTALL) -m 0644 config/wifi.conf \
+		$(DESTDIR)$(BOOTDIR)
+	ln -sf $(DESTDIR)$(BOOTDIR)/wifi.conf \
+		$(DESTDIR)$(ETCDIR)/wpa_supplicant/wpa_supplicant.conf
 
 imageprune:
 	apt-get remove -y x11-common desktop-base gnome-icon-theme \
