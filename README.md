@@ -47,6 +47,10 @@ into a function 3D print server.
         $ cd matterQ
         $ sudo make install
 
+    This step can be skipped if WiFi is not requied.
+
+        $ sudo make wifi
+
 3.  Install austerusG (latest stable version)
 
         $ git clone https://github.com/greenarrow/austerusG.git
@@ -54,14 +58,6 @@ into a function 3D print server.
         $ git checkout `git describe --abbrev=0`
         $ make
         $ sudo make install
-
-4.  Setup WiFi
-
-    If you will be using a WiFi adaptor connected to the Raspberry Pi and have
-    not already configured it then run the following command and follow the
-    instructions:
-
-        $ sudo make wifi
 
 5.  Restart server
 
