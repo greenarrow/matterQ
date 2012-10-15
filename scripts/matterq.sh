@@ -1,4 +1,4 @@
 #!/bin/bash
 
-source /etc/austerusg.conf
+source /etc/matterq.conf
 

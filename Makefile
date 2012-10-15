@@ -29,10 +29,10 @@ sysconfig:
 	$(INSTALL) -m 0644 config/printcap $(DESTDIR)$(ETCDIR)
 	$(INSTALL) -m 0644 config/lpd.conf $(DESTDIR)$(ETCDIR)/lprng
 	$(INSTALL) -m 0644 config/lpd.perms $(DESTDIR)$(ETCDIR)/lprng
-	$(INSTALL) -m 0644 config/austerusg.conf $(DESTDIR)$(BOOTDIR)
+	$(INSTALL) -m 0644 config/matterq.conf $(DESTDIR)$(BOOTDIR)
 	$(INSTALL) -m 0755 scripts/matterq.sh $(DESTDIR)$(ETCDIR)/profile.d
 
-	ln -sf $(DESTDIR)$(BOOTDIR)/austerusg.conf $(DESTDIR)$(ETCDIR)
+	ln -sf $(DESTDIR)$(BOOTDIR)/matterq.conf $(DESTDIR)$(ETCDIR)
 
 	cp $(DESTDIR)$(BOOTDIR)/arm240_start.elf $(DESTDIR)$(BOOTDIR)/start.elf
 
