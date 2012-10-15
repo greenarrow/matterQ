@@ -6,7 +6,7 @@
 #    exit 2
 #fi
 
-source /etc/profile.d/austerusg.sh
+source /etc/profile.d/matterq.sh
 
 austerus-send -v $SPOOL_DIR/$DATAFILES
 #austerus-send -s -v $SPOOL_DIR/$DATAFILES
