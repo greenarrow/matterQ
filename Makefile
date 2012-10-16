@@ -26,6 +26,7 @@ sysconfig:
 	$(INSTALL) -d $(DESTDIR)$(ETCDIR)/lprng
 	$(INSTALL) -d $(DESTDIR)$(ETCDIR)/profile.d
 	$(INSTALL) -d $(DESTDIR)$(BOOTDIR)
+	$(INSTALL) -m 0644 config/motd $(DESTDIR)$(ETCDIR)
 	$(INSTALL) -m 0644 config/printcap $(DESTDIR)$(ETCDIR)
 	$(INSTALL) -m 0644 config/lpd.conf $(DESTDIR)$(ETCDIR)/lprng
 	$(INSTALL) -m 0644 config/lpd.perms $(DESTDIR)$(ETCDIR)/lprng
