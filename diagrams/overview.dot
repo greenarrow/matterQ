@@ -1,0 +1,23 @@
+digraph G {
+    rankdir=LR
+    node [style="rounded,filled", shape="box"]
+
+    subgraph cluster_0 {
+        spooler [label="Spooler\n(lprng)"]
+        filters [label="Filters"]
+        austerusG
+
+        spooler -> filters
+        filters -> austerusG
+
+        label = "matterQ"
+    }
+
+    file [label="Client\nComputer"]
+
+    firmware [label="3D Printer"]
+
+    file -> spooler [label="Local\nNetwork"]
+    austerusG -> firmware [label="Serial\nPort\n(USB)"]
+}
+
