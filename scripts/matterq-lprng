@@ -8,8 +8,7 @@
 
 source /etc/profile.d/matterq.sh
 
-austerus-send -v $SPOOL_DIR/$DATAFILES
-#austerus-send -s -v $SPOOL_DIR/$DATAFILES
+austerus-send -s $SPOOL_DIR/$DATAFILES
 
 if [ "$?" -eq 0 ]; then
     exit 0
