@@ -1,0 +1,63 @@
+#!/usr/bin/env python
+
+import os
+
+PLATE_PATH = "/tmp/plate"
+
+
+class Deposition(object):
+    def __init__(self, limits):
+        self._limits = limits
+
+    @staticmethod
+    def from_file(filename):
+        limits = {}
+
+        for line in open(filename):
+            parts = line.strip().split("\t")
+
+            if parts[0] == "E":
+                continue
+
+            limits[parts[0]] = (float(parts[1]), float(parts[2]))
+
+        assert set(limits.keys()) == set("XYZ")
+
+        return Deposition(limits)
+
+    def get_z_safe(self):
+        return self._limits["Z"][1]
+
+    def __and__(self, other):
+        if xover and yover:
+            return True
+
+        return False
+
+    def __repr__(self):
+        return "<Deposition(%f,%f,%f,%f)>" % (self._limits["X"][0],
+                                              self._limits["Y"][0],
+                                              self._limits["X"][1],
+                                              self._limits["Y"][1])
+
+if __name__ == "__main__":
+    depositions = []
+    z = 0
+
+    for filename in os.listdir(PLATE_PATH):
+        d = Deposition.from_file(os.path.join(PLATE_PATH, filename))
+        print d
+
+        depositions.append(d)
+        z = max(z, d.get_z_safe())
+
+    print "z", z
+
+    for d1 in depositions:
+        for d2 in depositions:
+            if d1 == d2:
+                continue
+
+            if d1 and d2:
+                print "conflict error", d1, d2
+
