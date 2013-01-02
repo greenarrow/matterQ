@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
 import os
+import cairo
 
 PLATE_PATH = "/tmp/plate"
+OUTPUT = "/tmp/test.svg"
+WIDTH, HEIGHT  = 200, 200
 
 
 class Deposition(object):
@@ -28,6 +31,21 @@ class Deposition(object):
     def get_z_safe(self):
         return self._limits["Z"][1]
 
+    def draw(self, ctx):
+        print "draw", self._limits["X"][0], \
+                      self._limits["Y"][0], \
+                      self._limits["X"][1] - self._limits["X"][0], \
+                      self._limits["Y"][1] - self._limits["Y"][0]
+
+        ctx.set_source_rgb(1.0, 0.0, 0.0)
+
+        ctx.rectangle(self._limits["X"][0],
+                      self._limits["Y"][0],
+                      self._limits["X"][1] - self._limits["X"][0],
+                      self._limits["Y"][1] - self._limits["Y"][0])
+
+        ctx.fill()
+
     def __and__(self, other):
         if xover and yover:
             return True
@@ -41,11 +59,22 @@ class Deposition(object):
                                               self._limits["Y"][1])
 
 if __name__ == "__main__":
+    f = file("/tmp/test.svg", "w")
+    surface = cairo.SVGSurface(f, WIDTH, HEIGHT)
+    ctx = cairo.Context(surface)
+
+    ctx.set_line_width(1.0)
+
+    ctx.set_source_rgb(0.6, 0.6, 0.6)
+    ctx.rectangle(0, 0, WIDTH, HEIGHT)
+    ctx.fill()
+
     depositions = []
     z = 0
 
     for filename in os.listdir(PLATE_PATH):
         d = Deposition.from_file(os.path.join(PLATE_PATH, filename))
+        d.draw(ctx)
         print d
 
         depositions.append(d)
@@ -60,4 +89,6 @@ if __name__ == "__main__":
 
             if d1 and d2:
                 print "conflict error", d1, d2
+
+    surface.finish()
 
