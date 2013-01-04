@@ -9,12 +9,14 @@ PLATE_PATH = "/tmp/plate"
 WIDTH, HEIGHT  = 200, 200
 
 
-class Deposition(object):
+class Region(object):
+    _colour = (0.0, 0.0, 0.0)
+
     def __init__(self, limits):
         self._limits = limits
 
-    @staticmethod
-    def from_str(string):
+    @classmethod
+    def from_str(cls, string):
         limits = {}
 
         for line in string.split("\n"):
@@ -30,12 +32,12 @@ class Deposition(object):
 
         assert set(limits.keys()) == set("XYZ")
 
-        return Deposition(limits)
+        return cls(limits)
 
 
-    @staticmethod
-    def from_file(filename):
-        return Deposition.from_str(open(filename).read())
+    @classmethod
+    def from_file(cls, filename):
+        return cls.from_str(open(filename).read())
 
     def get_z_safe(self):
         return self._limits["Z"][1]
@@ -46,7 +48,7 @@ class Deposition(object):
                       self._limits["X"][1] - self._limits["X"][0], \
                       self._limits["Y"][1] - self._limits["Y"][0]
 
-        ctx.set_source_rgb(1.0, 0.0, 0.0)
+        ctx.set_source_rgb(*self._colour)
 
         ctx.rectangle(self._limits["X"][0],
                       self._limits["Y"][0],
@@ -62,10 +64,23 @@ class Deposition(object):
         return False
 
     def __repr__(self):
-        return "<Deposition(%f,%f,%f,%f)>" % (self._limits["X"][0],
-                                              self._limits["Y"][0],
-                                              self._limits["X"][1],
-                                              self._limits["Y"][1])
+        return "<%s(%f,%f,%f,%f)>" % (type(self).__name__,
+                                      self._limits["X"][0],
+                                      self._limits["Y"][0],
+                                      self._limits["X"][1],
+                                      self._limits["Y"][1])
+
+
+class Deposition(Region):
+    _colour = (1.0, 0.0, 0.0)
+
+
+class NewArea(Region):
+    _colour = (0.0, 0.8, 0.0)
+
+
+class ResetArea(Region):
+    _colour = (1.0, 1.0, 0.0)
 
 
 def parse_args():
