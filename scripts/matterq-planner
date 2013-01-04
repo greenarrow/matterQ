@@ -14,10 +14,13 @@ class Deposition(object):
         self._limits = limits
 
     @staticmethod
-    def from_file(filename):
+    def from_str(string):
         limits = {}
 
-        for line in open(filename):
+        for line in string.split("\n"):
+            if len(line) == 0:
+                continue
+
             parts = line.strip().split("\t")
 
             if parts[0] == "E":
@@ -28,6 +31,11 @@ class Deposition(object):
         assert set(limits.keys()) == set("XYZ")
 
         return Deposition(limits)
+
+
+    @staticmethod
+    def from_file(filename):
+        return Deposition.from_str(open(filename).read())
 
     def get_z_safe(self):
         return self._limits["Z"][1]
