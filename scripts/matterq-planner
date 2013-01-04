@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import argparse
 import cairo
 
@@ -104,14 +105,16 @@ if __name__ == "__main__":
 
     print "z", z
 
+    if args.svg is not None:
+        surface.finish()
+
     for d1 in depositions:
         for d2 in depositions:
             if d1 == d2:
                 continue
 
             if d1 and d2:
-                print "conflict error", d1, d2
-
-    if args.svg is not None:
-        surface.finish()
+                sys.stderr.write("existing depositions conflict: %s & %s\n",
+                                 (d1, d2))
+                sys.exit(2)
 
