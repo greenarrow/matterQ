@@ -10,7 +10,7 @@ WIDTH, HEIGHT  = 200, 200
 
 
 class Region(object):
-    _colour = (0.0, 0.0, 0.0)
+    _colour = (0.0, 0.0, 0.0, 1.0)
 
     def __init__(self, limits):
         self._limits = limits
@@ -48,7 +48,7 @@ class Region(object):
                       self._limits["X"][1] - self._limits["X"][0], \
                       self._limits["Y"][1] - self._limits["Y"][0]
 
-        ctx.set_source_rgb(*self._colour)
+        ctx.set_source_rgba(*self._colour)
 
         ctx.rectangle(self._limits["X"][0],
                       self._limits["Y"][0],
@@ -72,15 +72,15 @@ class Region(object):
 
 
 class Deposition(Region):
-    _colour = (1.0, 0.0, 0.0)
+    _colour = (1.0, 0.0, 0.0, 0.8)
 
 
 class NewArea(Region):
-    _colour = (0.0, 0.8, 0.0)
+    _colour = (0.0, 0.8, 0.0, 0.8)
 
 
 class ResetArea(Region):
-    _colour = (1.0, 1.0, 0.0)
+    _colour = (1.0, 1.0, 0.0, 0.8)
 
 
 def parse_args():
