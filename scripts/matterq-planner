@@ -43,11 +43,6 @@ class Region(object):
         return self._limits["Z"][1]
 
     def draw(self, ctx):
-        print "draw", self._limits["X"][0], \
-                      self._limits["Y"][0], \
-                      self._limits["X"][1] - self._limits["X"][0], \
-                      self._limits["Y"][1] - self._limits["Y"][0]
-
         ctx.set_source_rgba(*self._colour)
 
         ctx.rectangle(self._limits["X"][0],
@@ -118,10 +113,9 @@ if __name__ == "__main__":
 
     for filename in os.listdir(PLATE_PATH):
         d = Deposition.from_file(os.path.join(PLATE_PATH, filename))
+
         if args.svg is not None:
             d.draw(ctx)
-
-        print d
 
         depositions.append(d)
         z = max(z, d.get_z_safe())
