@@ -111,23 +111,20 @@ if __name__ == "__main__":
     # Load all existing depositions on the plate.
 
     depositions = []
-    z = 0
 
     for filename in os.listdir(PLATE_PATH):
         d = Deposition.from_file(os.path.join(PLATE_PATH, filename))
+        depositions.append(d)
 
         if args.svg is not None:
             d.draw(ctx)
-
-        depositions.append(d)
-        z = max(z, d.get_z_safe())
-
-    print "z", z
 
     if args.svg is not None:
         surface.finish()
 
     # Detect any conflicts and calculate safe working Z value.
+
+    z = 0.0
 
     for d1 in depositions:
         for d2 in depositions:
@@ -138,4 +135,8 @@ if __name__ == "__main__":
                 sys.stderr.write("existing depositions conflict: %s & %s\n",
                                  (d1, d2))
                 sys.exit(2)
+
+        z = max(z, d1.get_z_safe())
+
+    sys.stderr.write("safe moving Z: %f\n" % z)
 
