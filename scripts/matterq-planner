@@ -28,6 +28,8 @@ class Region(object):
             if parts[0] == "E":
                 continue
 
+            assert len(parts) == 3
+
             limits[parts[0]] = (float(parts[1]), float(parts[2]))
 
         assert set(limits.keys()) == set("XYZ")
