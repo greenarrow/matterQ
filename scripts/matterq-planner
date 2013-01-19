@@ -70,12 +70,12 @@ class Region(object):
             clear = ((other._limits[axis][0] < self._limits[axis][0] and
                       other._limits[axis][1] < self._limits[axis][0]) or
                      (other._limits[axis][0] > self._limits[axis][1] and
-                      other._limits[axis][1] < self._limits[axis][1]))
+                      other._limits[axis][1] > self._limits[axis][1]))
 
-            if not clear:
-                return True
+            if clear:
+                return False
 
-        return False
+        return True
 
     def __repr__(self):
         return "<%s(%f,%f,%f,%f)>" % (type(self).__name__,
