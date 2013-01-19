@@ -3,6 +3,7 @@
 import os
 import sys
 import argparse
+import subprocess
 import cairo
 
 PLATE_PATH = "/tmp/plate"
@@ -118,6 +119,9 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
 
+    head = map(float, os.environ["MQ_HEADSIZE"].split(":"))
+    assert len(head) == 4
+
     if args.svg is not None:
         surface = cairo.SVGSurface(args.svg, WIDTH, HEIGHT)
         ctx = cairo.Context(surface)
@@ -139,6 +143,21 @@ if __name__ == "__main__":
         if args.svg is not None:
             d.draw(ctx)
 
+    # Create a Region with the intended working bounds of the new print so we
+    # can check for conflicts with existing regions.
+
+    p = subprocess.Popen(["austerus-verge", "-p", args.filename],
+                         stdout=subprocess.PIPE)
+
+    assert p.wait() == 0
+    out, err = p.communicate()
+
+    new = NewArea.from_str(out)
+    new.add_head_clearance(*head)
+
+    if args.svg is not None:
+        new.draw(ctx)
+
     if args.svg is not None:
         surface.finish()
 
@@ -155,6 +174,11 @@ if __name__ == "__main__":
                 sys.stderr.write("existing depositions conflict: %s & %s\n",
                                  (d1, d2))
                 sys.exit(2)
+
+        if d1 & new:
+            sys.stderr.write("conflict with existing deposition: %s\n" % d1)
+            sys.stderr.write("TODO attempt to shift\n")
+            sys.exit(1)
 
         z = max(z, d1.get_z_safe())
 
