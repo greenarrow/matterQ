@@ -190,18 +190,24 @@ if __name__ == "__main__":
     if args.svg is not None:
         zreset.draw(ctx)
 
-    if args.svg is not None:
-        surface.finish()
 
     # Detect any conflicts
 
     if check_conflict(depositions, new):
         sys.stderr.write("conflict with existing deposition\n")
         sys.stderr.write("TODO attempt to shift\n")
+
+        if args.svg is not None:
+            surface.finish()
+
         sys.exit(1)
 
     if check_conflict(depositions, zreset):
         sys.stderr.write("Z reset conflict error: %s\n")
+
+        if args.svg is not None:
+            surface.finish()
+
         sys.exit(2)
 
     # Calculate safe working Z value.
@@ -212,4 +218,7 @@ if __name__ == "__main__":
         z = max(z, d1.get_z_safe())
 
     sys.stderr.write("safe moving Z: %f\n" % z)
+
+    if args.svg is not None:
+        surface.finish()
 
