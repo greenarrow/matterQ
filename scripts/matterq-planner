@@ -119,7 +119,7 @@ def check_conflict(depositions, new):
                 continue
 
             if d1 & d2:
-                sys.stderr.write("existing depositions conflict: %s & %s\n" %
+                sys.stderr.write("Existing depositions conflict: %s & %s\n" %
                                  (d1, d2))
                 sys.exit(2)
 
@@ -206,7 +206,7 @@ if __name__ == "__main__":
     # Detect any conflicts
 
     if check_conflict(depositions, zreset):
-        sys.stderr.write("Z reset conflict error: %s\n")
+        sys.stderr.write("Z reset conflict error\n")
 
         if args.svg is not None:
             surface.finish()
@@ -214,7 +214,7 @@ if __name__ == "__main__":
         sys.exit(2)
 
     if check_conflict(depositions, new):
-        sys.stderr.write("conflict with existing deposition\n")
+        sys.stderr.write("Conflict with existing deposition\n")
 
         p = subprocess.Popen(["austerus-verge", "-pd", args.filename],
                              stdout=subprocess.PIPE)
