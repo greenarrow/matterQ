@@ -195,7 +195,23 @@ if __name__ == "__main__":
 
     if check_conflict(depositions, new):
         sys.stderr.write("conflict with existing deposition\n")
-        sys.stderr.write("TODO attempt to shift\n")
+
+        p = subprocess.Popen(["austerus-verge", "-pd", args.filename],
+                             stdout=subprocess.PIPE)
+
+        assert p.wait() == 0
+        out, err = p.communicate()
+
+        newdep = NewArea.from_str(out)
+        assert newdep <= bed
+
+        newdep.add_head_clearance(*head)
+
+        if args.svg is not None:
+            newdep.draw(ctx)
+
+        if args.svg is not None:
+            surface.finish()
 
         if args.svg is not None:
             surface.finish()
