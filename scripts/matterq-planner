@@ -128,6 +128,11 @@ if __name__ == "__main__":
     head = map(float, os.environ["MQ_HEADSIZE"].split(":"))
     assert len(head) == 4
 
+    bedsize = map(float, os.environ["MQ_PRINTBED"].split(":"))
+    assert len(bedsize) == 2
+
+    bed = Region({"X" : (0.0, bedsize[0]), "Y" : (0.0, bedsize[1])})
+
     if args.svg is not None:
         surface = cairo.SVGSurface(args.svg, WIDTH, HEIGHT)
         ctx = cairo.Context(surface)
@@ -159,6 +164,8 @@ if __name__ == "__main__":
     out, err = p.communicate()
 
     new = NewArea.from_str(out)
+    assert new <= bed
+
     new.add_head_clearance(*head)
 
     if args.svg is not None:
