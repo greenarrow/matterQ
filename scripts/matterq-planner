@@ -55,6 +55,12 @@ class Region(object):
 
         ctx.fill()
 
+    def __le__(self, other):
+        return (self._limits["X"][0] >= other._limits["X"][0] and
+                self._limits["X"][1] <= other._limits["X"][1] and
+                self._limits["Y"][0] >= other._limits["Y"][0] and
+                self._limits["Y"][1] <= other._limits["Y"][1])
+
     def __and__(self, other):
         xover = ((other._limits["X"][0] >= self._limits["X"][0] and
                   other._limits["X"][0] <= self._limits["X"][1]) or
