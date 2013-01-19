@@ -36,7 +36,6 @@ class Region(object):
 
         return cls(limits)
 
-
     @classmethod
     def from_file(cls, filename):
         return cls.from_str(open(filename).read())
