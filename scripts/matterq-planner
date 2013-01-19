@@ -100,6 +100,21 @@ class ResetArea(WorkArea):
     _colour = (1.0, 1.0, 0.0, 0.8)
 
 
+def check_conflict(depositions, new):
+    for d1 in depositions:
+        for d2 in depositions:
+            if d1 == d2:
+                continue
+
+            if d1 & d2:
+                sys.stderr.write("existing depositions conflict: %s & %s\n" %
+                                 (d1, d2))
+                sys.exit(2)
+
+        if d1 & new:
+            return True
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
 
@@ -178,29 +193,22 @@ if __name__ == "__main__":
     if args.svg is not None:
         surface.finish()
 
-    # Detect any conflicts and calculate safe working Z value.
+    # Detect any conflicts
+
+    if check_conflict(depositions, new):
+        sys.stderr.write("conflict with existing deposition\n")
+        sys.stderr.write("TODO attempt to shift\n")
+        sys.exit(1)
+
+    if check_conflict(depositions, zreset):
+        sys.stderr.write("Z reset conflict error: %s\n")
+        sys.exit(2)
+
+    # Calculate safe working Z value.
 
     z = 0.0
 
     for d1 in depositions:
-        for d2 in depositions:
-            if d1 == d2:
-                continue
-
-            if d1 & d2:
-                sys.stderr.write("existing depositions conflict: %s & %s\n",
-                                 (d1, d2))
-                sys.exit(2)
-
-        if d1 & new:
-            sys.stderr.write("conflict with existing deposition: %s\n" % d1)
-            sys.stderr.write("TODO attempt to shift\n")
-            sys.exit(1)
-
-        if d1 & zreset:
-            sys.stderr.write("Z reset conflict error: %s\n" % d1)
-            sys.exit(2)
-
         z = max(z, d1.get_z_safe())
 
     sys.stderr.write("safe moving Z: %f\n" % z)
