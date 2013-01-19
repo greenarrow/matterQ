@@ -176,11 +176,18 @@ if __name__ == "__main__":
         if args.svg is not None:
             d.draw(ctx)
 
+    # Calculate safe working Z value.
+
+    z = 0.0
+
+    for d1 in depositions:
+        zmin = max(z, d1.get_z_safe())
+
     # Create a Region with the intended working bounds of the new print so we
     # can check for conflicts with existing regions.
 
-    p = subprocess.Popen(["austerus-verge", "-p", args.filename],
-                         stdout=subprocess.PIPE)
+    p = subprocess.Popen(["austerus-verge", "-p", "-z", str(zmin + 5),
+                          args.filename], stdout=subprocess.PIPE)
 
     assert p.wait() == 0
     out, err = p.communicate()
@@ -201,7 +208,6 @@ if __name__ == "__main__":
 
     if args.svg is not None:
         zreset.draw(ctx)
-
 
     # Detect any conflicts
 
@@ -261,15 +267,7 @@ if __name__ == "__main__":
         if args.svg is not None:
             new.draw(ctx)
 
-
-    # Calculate safe working Z value.
-
-    z = 0.0
-
-    for d1 in depositions:
-        z = max(z, d1.get_z_safe())
-
-    print "Z\t%f" % z
+    print "Z\t%f" % zmin
 
     if args.svg is not None:
         surface.finish()
