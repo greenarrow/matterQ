@@ -234,7 +234,8 @@ if __name__ == "__main__":
                 newdep.shift(x, y)
 
                 if newdep <= bed:
-                    if not check_conflict(depositions, newdep):
+                    if not check_conflict(depositions, newdep) and \
+                       not check_conflict([zreset], newdep):
                         shift = x, y
                         break
 
