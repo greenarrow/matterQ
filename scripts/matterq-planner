@@ -43,6 +43,12 @@ class Region(object):
     def get_z_safe(self):
         return self._limits["Z"][1]
 
+    def shift(self, x, y):
+        self._limits["X"] = (self._limits["X"][0] + x,
+                             self._limits["X"][1] + x)
+        self._limits["Y"] = (self._limits["Y"][0] + y,
+                             self._limits["Y"][1] + y)
+
     def draw(self, ctx):
         ctx.set_source_rgba(*self._colour)
 
@@ -206,16 +212,31 @@ if __name__ == "__main__":
 
         newdep.add_head_clearance(*head)
 
+        shift = None
+
+        for y in range(-int(bedsize[1]), int(bedsize[1]), 5):
+            if shift is not None:
+                break
+
+            for x in range(-int(bedsize[0]), int(bedsize[0]), 5):
+                newdep.shift(x, y)
+
+                if newdep <= bed:
+                    if not check_conflict(depositions, newdep):
+                        shift = x, y
+                        break
+
+                newdep.shift(-x, -y)
+
+        if shift is None:
+            sys.stderr.write("Not enough room on build plate\n")
+            sys.exit(1)
+
         if args.svg is not None:
             newdep.draw(ctx)
 
         if args.svg is not None:
             surface.finish()
-
-        if args.svg is not None:
-            surface.finish()
-
-        sys.exit(1)
 
     if check_conflict(depositions, zreset):
         sys.stderr.write("Z reset conflict error: %s\n")
