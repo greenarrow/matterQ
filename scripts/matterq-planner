@@ -205,6 +205,8 @@ if __name__ == "__main__":
 
     # Detect any conflicts
 
+    shift = None
+
     if check_conflict(depositions, zreset):
         sys.stderr.write("Z reset conflict error\n")
 
@@ -227,8 +229,6 @@ if __name__ == "__main__":
 
         newdep.add_head_clearance(*head)
 
-        shift = None
-
         for y in range(-int(bedsize[1]), int(bedsize[1]), 5):
             if shift is not None:
                 break
@@ -246,7 +246,7 @@ if __name__ == "__main__":
 
         if shift is None:
             sys.stderr.write("Not enough room on build plate\n")
-            sys.exit(1)
+            sys.exit(2)
 
         if args.svg is not None:
             newdep.draw(ctx)
@@ -273,4 +273,9 @@ if __name__ == "__main__":
 
     if args.svg is not None:
         surface.finish()
+
+    if shift is None:
+        sys.exit(0)
+    else:
+        sys.exit(1)
 
