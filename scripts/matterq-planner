@@ -7,7 +7,6 @@ import subprocess
 import cairo
 
 PLATE_PATH = "/tmp/plate"
-WIDTH, HEIGHT  = 200, 200
 
 
 class Region(object):
@@ -130,13 +129,13 @@ if __name__ == "__main__":
     bed = Region({"X" : (0.0, bedsize[0]), "Y" : (0.0, bedsize[1])})
 
     if args.svg is not None:
-        surface = cairo.SVGSurface(args.svg, WIDTH, HEIGHT)
+        surface = cairo.SVGSurface(args.svg, bedsize[0], bedsize[1])
         ctx = cairo.Context(surface)
 
         ctx.set_line_width(1.0)
 
         ctx.set_source_rgb(0.6, 0.6, 0.6)
-        ctx.rectangle(0, 0, WIDTH, HEIGHT)
+        ctx.rectangle(0, 0, bedsize[0], bedsize[1])
         ctx.fill()
 
     # Load all existing depositions on the plate.
