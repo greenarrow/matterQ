@@ -49,7 +49,7 @@ class Region(object):
         self._limits["Y"] = (self._limits["Y"][0] + y,
                              self._limits["Y"][1] + y)
 
-    def draw(self, ctx):
+    def draw(self, ctx, outline=False):
         ctx.set_source_rgba(*self._colour)
 
         ctx.rectangle(self._limits["X"][0],
@@ -57,7 +57,10 @@ class Region(object):
                       self._limits["X"][1] - self._limits["X"][0],
                       self._limits["Y"][1] - self._limits["Y"][0])
 
-        ctx.fill()
+        if outline:
+            ctx.stroke()
+        else:
+            ctx.fill()
 
     def __le__(self, other):
         return (self._limits["X"][0] >= other._limits["X"][0] and
@@ -188,7 +191,7 @@ if __name__ == "__main__":
     new.add_head_clearance(*head)
 
     if args.svg is not None:
-        new.draw(ctx)
+        new.draw(ctx, outline=True)
 
     # Create a Region where the Z axis will be homed (X0 Y0) so that we can
     # check it is safe to do so.
@@ -253,6 +256,11 @@ if __name__ == "__main__":
 
         print "X\t%f" % shift[0]
         print "Y\t%f" % shift[1]
+
+    else:
+        if args.svg is not None:
+            new.draw(ctx)
+
 
     # Calculate safe working Z value.
 
