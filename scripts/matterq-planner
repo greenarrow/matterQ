@@ -82,11 +82,19 @@ class Deposition(Region):
     _colour = (1.0, 0.0, 0.0, 0.8)
 
 
-class NewArea(Region):
+class WorkArea(Region):
+    def add_head_clearance(self, x1, x2, y1, y2):
+        self._limits["X"] = (self._limits["X"][0] - x1,
+                             self._limits["X"][1] + x2)
+        self._limits["Y"] = (self._limits["Y"][0] - y1,
+                             self._limits["Y"][1] + y2)
+
+
+class NewArea(WorkArea):
     _colour = (0.0, 0.8, 0.0, 0.8)
 
 
-class ResetArea(Region):
+class ResetArea(WorkArea):
     _colour = (1.0, 1.0, 0.0, 0.8)
 
 
