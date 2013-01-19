@@ -101,6 +101,10 @@ class NewArea(WorkArea):
     _colour = (0.0, 0.8, 0.0, 0.8)
 
 
+class ShiftedArea(WorkArea):
+    _colour = (0.0, 0.0, 0.8, 0.6)
+
+
 class ResetArea(WorkArea):
     _colour = (1.0, 1.0, 0.0, 0.8)
 
@@ -207,7 +211,7 @@ if __name__ == "__main__":
         assert p.wait() == 0
         out, err = p.communicate()
 
-        newdep = NewArea.from_str(out)
+        newdep = ShiftedArea.from_str(out)
         assert newdep <= bed
 
         newdep.add_head_clearance(*head)
