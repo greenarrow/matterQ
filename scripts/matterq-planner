@@ -158,6 +158,15 @@ if __name__ == "__main__":
     if args.svg is not None:
         new.draw(ctx)
 
+    # Create a Region where the Z axis will be homed (X0 Y0) so that we can
+    # check it is safe to do so.
+
+    zreset = ResetArea({"X" : (0.0, 0.0), "Y" : (0.0, 0.0)})
+    zreset.add_head_clearance(*head)
+
+    if args.svg is not None:
+        zreset.draw(ctx)
+
     if args.svg is not None:
         surface.finish()
 
@@ -179,6 +188,10 @@ if __name__ == "__main__":
             sys.stderr.write("conflict with existing deposition: %s\n" % d1)
             sys.stderr.write("TODO attempt to shift\n")
             sys.exit(1)
+
+        if d1 & zreset:
+            sys.stderr.write("Z reset conflict error: %s\n" % d1)
+            sys.exit(2)
 
         z = max(z, d1.get_z_safe())
 
