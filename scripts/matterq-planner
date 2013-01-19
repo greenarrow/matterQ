@@ -62,18 +62,14 @@ class Region(object):
                 self._limits["Y"][1] <= other._limits["Y"][1])
 
     def __and__(self, other):
-        xover = ((other._limits["X"][0] >= self._limits["X"][0] and
-                  other._limits["X"][0] <= self._limits["X"][1]) or
-                 (other._limits["X"][1] >= self._limits["X"][0] and
-                  other._limits["X"][1] <= self._limits["X"][1]))
+        for axis in ("X", "Y"):
+            clear = ((other._limits[axis][0] < self._limits[axis][0] and
+                      other._limits[axis][1] < self._limits[axis][0]) or
+                     (other._limits[axis][0] > self._limits[axis][1] and
+                      other._limits[axis][1] < self._limits[axis][1]))
 
-        yover = ((other._limits["Y"][0] >= self._limits["Y"][0] and
-                  other._limits["Y"][0] <= self._limits["Y"][1]) or
-                 (other._limits["Y"][1] >= self._limits["Y"][0] and
-                  other._limits["Y"][1] <= self._limits["Y"][1]))
-
-        if xover and yover:
-            return True
+            if not clear:
+                return True
 
         return False
 
