@@ -251,6 +251,9 @@ if __name__ == "__main__":
         if args.svg is not None:
             surface.finish()
 
+        print "X\t%f" % shift[0]
+        print "Y\t%f" % shift[1]
+
     # Calculate safe working Z value.
 
     z = 0.0
@@ -258,7 +261,7 @@ if __name__ == "__main__":
     for d1 in depositions:
         z = max(z, d1.get_z_safe())
 
-    sys.stderr.write("safe moving Z: %f\n" % z)
+    print "Z\t%f" % z
 
     if args.svg is not None:
         surface.finish()
