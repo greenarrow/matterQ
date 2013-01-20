@@ -141,6 +141,10 @@ def parse_args():
                         metavar="FILE",
                         help="Write planner SVG")
 
+    parser.add_argument("--verbose",
+                        action="store_true",
+                        help="Explain what is being done")
+
     return parser.parse_args()
 
 
@@ -214,7 +218,8 @@ if __name__ == "__main__":
     shift = None
 
     if check_conflict(depositions, zreset):
-        sys.stderr.write("Z reset conflict error\n")
+        if args.verbose:
+            sys.stderr.write("Z reset conflict error\n")
 
         if args.svg is not None:
             surface.finish()
@@ -222,7 +227,8 @@ if __name__ == "__main__":
         sys.exit(2)
 
     if check_conflict(depositions, new):
-        sys.stderr.write("Conflict with existing deposition\n")
+        if args.verbose:
+            sys.stderr.write("Conflict with existing deposition\n")
 
         p = subprocess.Popen(["austerus-verge", "-pd", args.filename],
                              stdout=subprocess.PIPE)
@@ -251,7 +257,9 @@ if __name__ == "__main__":
                 newdep.shift(-x, -y)
 
         if shift is None:
-            sys.stderr.write("Not enough room on build plate\n")
+            if args.verbose:
+                sys.stderr.write("Not enough room on build plate\n")
+
             sys.exit(2)
 
         if args.svg is not None:
