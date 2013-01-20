@@ -122,7 +122,7 @@ def check_conflict(depositions, new):
             if d1 & d2:
                 sys.stderr.write("Existing depositions conflict: %s & %s\n" %
                                  (d1, d2))
-                sys.exit(2)
+                assert False
 
         if d1 & new:
             return True
