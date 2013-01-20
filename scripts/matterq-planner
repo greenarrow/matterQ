@@ -4,6 +4,7 @@ import os
 import sys
 import argparse
 import subprocess
+import traceback
 import cairo
 
 PLATE_PATH = "/tmp/plate"
@@ -148,7 +149,7 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+def main():
     args = parse_args()
 
     head = map(float, os.environ["MQ_HEADSIZE"].split(":"))
@@ -284,4 +285,12 @@ if __name__ == "__main__":
         sys.exit(0)
     else:
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except AssertionError:
+        traceback.print_exc()
+        sys.exit(3)
 
