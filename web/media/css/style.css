@@ -1,0 +1,22 @@
+table {
+    padding: 3px;
+    margin: 0.8em;
+    background: #f9f9f9;
+    border: 1px #aaaaaa solid;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    border: 1px #aaaaaa solid;
+    padding: 0.2em;
+}
+
+table th, table th {
+    background: #f2f2f2;
+    text-align: center;
+}
+table caption{
+    margin-left: inherit;
+    margin-right: inherit;
+}
+

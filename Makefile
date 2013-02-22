@@ -2,6 +2,7 @@ PREFIX ?= /usr/local
 BINDIR ?= $(PREFIX)/bin
 MANDIR ?= $(PREFIX)/share/man
 EXEDIR ?= $(PREFIX)/libexec
+VARDIR ?= /var
 ETCDIR ?= /etc
 TMPDIR ?= /tmp
 BOOTDIR ?= /boot
@@ -24,6 +25,17 @@ filter:
 	$(INSTALL) -m 0755 scripts/matterq-lprng \
 		$(DESTDIR)$(EXEDIR)/filters
 
+web:
+	$(INSTALL) -d $(DESTDIR)$(VARDIR)/www/cgi-bin
+	$(INSTALL) -d $(DESTDIR)$(VARDIR)/www/media/css
+	$(INSTALL) -d $(DESTDIR)$(VARDIR)/www/media/js
+	$(INSTALL) -d $(DESTDIR)$(VARDIR)/www/media/images
+	$(INSTALL) -m 0755 web/index.py $(DESTDIR)$(VARDIR)/www/cgi-bin
+	$(INSTALL) -m 0644 web/media/css/style.css $(DESTDIR)$(VARDIR)/www/media/css
+	$(INSTALL) -m 0644 web/media/js/common.js $(DESTDIR)$(VARDIR)/www/media/js
+	$(INSTALL) -m 0644 web/media/images/tick32.png $(DESTDIR)$(VARDIR)/www/media/images
+	$(INSTALL) -m 0644 web/media/images/stop32.png $(DESTDIR)$(VARDIR)/www/media/images
+
 sysconfig:
 	# System configuration
 	$(INSTALL) -d $(DESTDIR)$(ETCDIR)/lprng
@@ -33,7 +45,7 @@ sysconfig:
 	$(INSTALL) -m 0644 config/printcap $(DESTDIR)$(ETCDIR)
 	$(INSTALL) -m 0644 config/lpd.conf $(DESTDIR)$(ETCDIR)/lprng
 	$(INSTALL) -m 0644 config/lpd.perms $(DESTDIR)$(ETCDIR)/lprng
-	$(INSTALL) -m 0755 config/lighttpd.conf $(DESTDIR)$(ETCDIR)
+	$(INSTALL) -m 0755 config/lighttpd.conf $(DESTDIR)$(ETCDIR)/lighttpd
 	$(INSTALL) -m 0644 config/matterq.conf $(DESTDIR)$(BOOTDIR)
 	$(INSTALL) -m 0755 scripts/matterq.sh $(DESTDIR)$(ETCDIR)/profile.d
 
