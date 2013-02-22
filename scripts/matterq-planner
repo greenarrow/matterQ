@@ -11,11 +11,32 @@ MQ_SPOOLDIR = os.environ["MQ_SPOOLDIR"]
 PLATE_PATH = os.path.join(MQ_SPOOLDIR, "depositions")
 
 
-class Region(object):
-    _colour = (0.0, 0.0, 0.0, 1.0)
+class Clearance(object):
+    def __init__(self, x1, x2, y1, y2):
+        self.x1 = x1
+        self.x2 = x2
+        self.y1 = y1
+        self.y2 = y2
 
-    def __init__(self, limits):
-        self._limits = limits
+    @classmethod
+    def from_str(cls, string):
+        parts = map(float, string.split(":"))
+        return Clearance(*parts)
+
+
+class Region(object):
+    def __init__(self, x1, x2, y1, y2, z1=None, z2=None):
+        self.x1 = x1
+        self.x2 = x2
+        self.y1 = y1
+        self.y2 = y2
+        self.z1 = z1
+        self.z2 = z2
+
+    @classmethod
+    def from_dict(cls, limits):
+        return Region(limits["X"][0], limits["X"][1], limits["Y"][0],
+                      limits["Y"][1], limits["Z"][0], limits["Z"][1])
 
     @classmethod
     def from_str(cls, string):
@@ -36,85 +57,81 @@ class Region(object):
 
         assert set(limits.keys()) == set("XYZ")
 
-        return cls(limits)
+        return cls.from_dict(limits)
 
     @classmethod
     def from_file(cls, filename):
         return cls.from_str(open(filename).read())
 
     def get_z_safe(self):
-        return self._limits["Z"][1]
+        if self.z2 is None:
+            raise KeyError
+
+        return self.z2
 
     def shift(self, x, y):
-        self._limits["X"] = (self._limits["X"][0] + x,
-                             self._limits["X"][1] + x)
-        self._limits["Y"] = (self._limits["Y"][0] + y,
-                             self._limits["Y"][1] + y)
+        self.x1, self.x2 = (self.x1 + x,
+                            self.x2 + x)
+        self.y1, self.y2 = (self.y1 + y,
+                            self.y2 + y)
 
-    def draw(self, ctx, outline=False):
-        ctx.set_source_rgba(*self._colour)
+    def draw(self, ctx, colour, outline=False, label=None):
+        ctx.set_source_rgba(*colour)
 
-        ctx.rectangle(self._limits["X"][0],
-                      self._limits["Y"][0],
-                      self._limits["X"][1] - self._limits["X"][0],
-                      self._limits["Y"][1] - self._limits["Y"][0])
+        ctx.rectangle(self.x1,
+                      self.y1,
+                      self.x2 - self.x1,
+                      self.y2 - self.y1)
 
         if outline:
             ctx.stroke()
         else:
             ctx.fill()
 
+        if label is not None:
+            ctx.set_source_rgba(0, 0, 0)
+            ctx.move_to(max(0, self.x1),
+                        max(0, self.y1))
+            ctx.show_text(label)
+
     def __le__(self, other):
-        return (self._limits["X"][0] >= other._limits["X"][0] and
-                self._limits["X"][1] <= other._limits["X"][1] and
-                self._limits["Y"][0] >= other._limits["Y"][0] and
-                self._limits["Y"][1] <= other._limits["Y"][1])
+        return (self.x1 >= other.x1 and
+                self.x2 <= other.x2 and
+                self.y1 >= other.y1 and
+                self.y2 <= other.y2)
 
     def __and__(self, other):
         for axis in ("X", "Y"):
-            clear = ((other._limits[axis][0] < self._limits[axis][0] and
-                      other._limits[axis][1] < self._limits[axis][0]) or
-                     (other._limits[axis][0] > self._limits[axis][1] and
-                      other._limits[axis][1] > self._limits[axis][1]))
+            if other.x1 < self.x1 and other.x2 < self.x1:
+                return False
 
-            if clear:
+            if other.x1 > self.x2 and other.x2 > self.x2:
+                return False
+
+            if other.y1 < self.y1 and other.y2 < self.y1:
+                return False
+
+            if other.y1 > self.y2 and other.y2 > self.y2:
                 return False
 
         return True
 
+    def __add__(self, other):
+        if not isinstance(other, Clearance):
+            raise TypeError
+
+        return Region(self.x1 - other.x1, self.x2 + other.x2,
+                      self.y1 - other.y1, self.y2 + other.y2)
+
     def __repr__(self):
         return "<%s(%f,%f,%f,%f)>" % (type(self).__name__,
-                                      self._limits["X"][0],
-                                      self._limits["Y"][0],
-                                      self._limits["X"][1],
-                                      self._limits["Y"][1])
+                                      self.x1,
+                                      self.y1,
+                                      self.x2,
+                                      self.y2)
 
 
-class Deposition(Region):
-    _colour = (1.0, 0.0, 0.0, 0.8)
-
-
-class WorkArea(Region):
-    def add_head_clearance(self, x1, x2, y1, y2):
-        self._limits["X"] = (self._limits["X"][0] - x1,
-                             self._limits["X"][1] + x2)
-        self._limits["Y"] = (self._limits["Y"][0] - y1,
-                             self._limits["Y"][1] + y2)
-
-
-class NewArea(WorkArea):
-    _colour = (0.0, 0.8, 0.0, 0.8)
-
-
-class ShiftedArea(WorkArea):
-    _colour = (0.0, 0.0, 0.8, 0.6)
-
-
-class ResetArea(WorkArea):
-    _colour = (1.0, 1.0, 0.0, 0.8)
-
-
-def check_conflict(depositions, new):
+def detect_collisions(depositions, new):
     for d1 in depositions:
         for d2 in depositions:
             if d1 == d2:
@@ -123,10 +140,58 @@ def check_conflict(depositions, new):
             if d1 & d2:
                 sys.stderr.write("Existing depositions conflict: %s & %s\n" %
                                  (d1, d2))
-                assert False
+                assert True
 
         if d1 & new:
             return True
+
+    return False
+
+
+def initial_region_zmin(args, zsafe, head, zmin):
+    # Create a Region with the intended working bounds of the new print so we
+    # can check for conflicts with existing regions.
+    ignore = '"%d:%d:%d:%d"' % ((zsafe + head).x1, (zsafe + head).x2,
+                                (zsafe + head).y1, (zsafe + head).y2)
+
+    cmd = ["austerus-verge", "-p", "-i", ignore]
+    if zmin is not None:
+        cmd.append("-z")
+        cmd.append(str(zmin))
+
+    cmd.append(args.filename)
+
+    if args.verbose:
+        sys.stderr.write("run: ")
+        sys.stderr.write(str(" ".join(cmd)))
+        sys.stderr.write("\n")
+
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+
+    assert p.wait() == 0
+    out, err = p.communicate()
+
+    new = Region.from_str(out)
+
+    return new
+
+
+def initial_region_deposition(args):
+    cmd = ["austerus-verge", "-p", "-d", args.filename]
+
+    if args.verbose:
+        sys.stderr.write("run: ")
+        sys.stderr.write(str(" ".join(cmd)))
+        sys.stderr.write("\n")
+
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+
+    assert p.wait() == 0
+    out, err = p.communicate()
+
+    newdep = Region.from_str(out)
+
+    return newdep
 
 
 def parse_args():
@@ -154,84 +219,103 @@ def parse_args():
 def main():
     args = parse_args()
 
-    head = map(float, os.environ["MQ_HEADSIZE"].split(":"))
-    assert len(head) == 4
+    head = Clearance.from_str(os.environ["MQ_HEADSIZE"])
 
     bedsize = map(float, os.environ["MQ_PRINTBED"].split(":"))
     assert len(bedsize) == 2
 
-    bed = Region({"X" : (0.0, bedsize[0]), "Y" : (0.0, bedsize[1])})
+    bed = Region(0.0, bedsize[0], 0.0, bedsize[1])
 
     if args.svg is not None:
-        surface = cairo.SVGSurface(args.svg, bedsize[0], bedsize[1])
+        surface = cairo.SVGSurface(args.svg, bed.x2, bed.y2)
         ctx = cairo.Context(surface)
 
         ctx.set_line_width(1.0)
 
         ctx.set_source_rgb(0.6, 0.6, 0.6)
-        ctx.rectangle(0, 0, bedsize[0], bedsize[1])
+        ctx.rectangle(0, 0, bed.x2, bed.y2)
         ctx.fill()
 
-    # Load all existing depositions on the plate.
+        # Axes
+        ctx.set_source_rgb(0, 0, 0)
 
+        ctx.move_to(5, 5)
+        ctx.line_to(45, 5)
+        ctx.stroke()
+
+        ctx.move_to(50, 5)
+        ctx.show_text("x")
+
+        ctx.move_to(5, 5)
+        ctx.line_to(5, 45)
+        ctx.stroke()
+
+        ctx.move_to(5, 50)
+        ctx.show_text("y")
+
+    # Create a Region where the Z axis will be homed (X0 Y0) so that we can
+    # check it is safe to do so.
+    zsafe = Region(0.0, 0.0, 0.0, 0.0)
+
+    if args.svg is not None:
+        (zsafe + head).draw(ctx, (1.0, 1.0, 0.0, 0.8))
+
+    # Load all existing depositions on the plate.
     depositions = []
 
     for filename in os.listdir(PLATE_PATH):
-        d = Deposition.from_file(os.path.join(PLATE_PATH, filename))
+        d = Region.from_file(os.path.join(PLATE_PATH, filename))
         depositions.append(d)
 
         if args.svg is not None:
-            d.draw(ctx)
+            d.draw(ctx, (1.0, 0.0, 0.0, 0.8))
 
     if args.filename is None:
         if args.svg is not None:
             surface.finish()
+
         exit(0)
 
     # Calculate safe working Z value.
-
     z = 0.0
     zmin = None
 
     for d1 in depositions:
-        zmin = max(z, d1.get_z_safe())
+        zmin = max(z, d1.get_z_safe()) + 5
 
-    # Create a Region with the intended working bounds of the new print so we
-    # can check for conflicts with existing regions.
+    new_working = initial_region_zmin(args, zsafe, head, zmin)
+    assert new_working <= bed
 
-    cmd = ["austerus-verge", "-p"]
-    if zmin is not None:
-        cmd.append("-z")
-        cmd.append(str(zmin + 5))
+    new_working.draw(ctx, (0.0, 0.0, 0.8, 0.8), outline=True, label="initial working")
 
-    cmd.append(args.filename)
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    new_deposition = initial_region_deposition(args)
+    assert new_deposition <= bed
 
-    assert p.wait() == 0
-    out, err = p.communicate()
+    new_deposition.draw(ctx, (0.0, 0.0, 0.8, 0.8), outline=True, label="initial")
 
-    new = NewArea.from_str(out)
-    assert new <= bed
+    valid = True
 
-    new.add_head_clearance(*head)
+    if detect_collisions(depositions, new_working + head):
+        sys.stderr.write("collision with existing\n")
+        valid = False
 
-    if args.svg is not None:
-        new.draw(ctx, outline=True)
+    if new_deposition & (zsafe + head):
+        sys.stderr.write("collision with zsafe\n")
+        valid = False
 
-    # Create a Region where the Z axis will be homed (X0 Y0) so that we can
-    # check it is safe to do so.
+    if valid:
+        if args.verbose:
+            sys.stderr.write("valid as is\n")
 
-    zreset = ResetArea({"X" : (0.0, 0.0), "Y" : (0.0, 0.0)})
-    zreset.add_head_clearance(*head)
+        if args.svg is not None:
+            new_deposition.draw(ctx, (0.0, 0.0, 0.8, 0.8))
+            surface.finish()
 
-    if args.svg is not None:
-        zreset.draw(ctx)
+        sys.exit(0)
 
-    # Detect any conflicts
-
-    shift = None
-
-    if check_conflict(depositions, zreset):
+    """
+    # bring back?
+    if detect_collisions(depositions, zsafe + head):
         if args.verbose:
             sys.stderr.write("Z reset conflict error\n")
 
@@ -239,55 +323,51 @@ def main():
             surface.finish()
 
         sys.exit(2)
+    """
 
-    if check_conflict(depositions, new):
+    # Detect any conflicts
+    shift = None
+
+    for y in range(-int(bedsize[1]), int(bedsize[1]), 5):
+        if shift is not None:
+            break
+
+        for x in range(-int(bedsize[0]), int(bedsize[0]), 5):
+            new_deposition.shift(x, y)
+
+            if (new_deposition + Clearance(5, 5, 5, 5)) <= bed:
+                if not detect_collisions(depositions, new_deposition + head) and \
+                   not new_deposition & (zsafe + head):
+                    shift = x, y
+                    break
+
+            new_deposition.shift(-x, -y)
+
+    if shift is None:
         if args.verbose:
-            sys.stderr.write("Conflict with existing deposition\n")
-
-        p = subprocess.Popen(["austerus-verge", "-pd", args.filename],
-                             stdout=subprocess.PIPE)
-
-        assert p.wait() == 0
-        out, err = p.communicate()
-
-        newdep = ShiftedArea.from_str(out)
-        assert newdep <= bed
-
-        newdep.add_head_clearance(*head)
-
-        for y in range(-int(bedsize[1]), int(bedsize[1]), 5):
-            if shift is not None:
-                break
-
-            for x in range(-int(bedsize[0]), int(bedsize[0]), 5):
-                newdep.shift(x, y)
-
-                if newdep <= bed:
-                    if not check_conflict(depositions, newdep) and \
-                       not check_conflict([zreset], newdep):
-                        shift = x, y
-                        break
-
-                newdep.shift(-x, -y)
-
-        if shift is None:
-            if args.verbose:
-                sys.stderr.write("Not enough room on build plate\n")
-
-            sys.exit(2)
-
-        if args.svg is not None:
-            newdep.draw(ctx)
+            sys.stderr.write("Not enough room on build plate\n")
 
         if args.svg is not None:
             surface.finish()
 
-        print "X\t%f" % shift[0]
-        print "Y\t%f" % shift[1]
+        sys.exit(2)
 
-    else:
-        if args.svg is not None:
-            new.draw(ctx)
+    x, y = shift
+
+    if args.svg is not None:
+        (new_deposition + head).draw(ctx, (0.0, 0.0, 0.8, 0.6), outline=True,
+                                     label="shifted working")
+        new_deposition.draw(ctx, (0.0, 0.0, 0.8, 0.6),
+                            label="shifted")
+
+    if args.svg is not None:
+        surface.finish()
+
+    if args.verbose:
+        sys.stderr.write("shifted: %s\n" % repr(new_deposition))
+
+    print "X\t%f" % shift[0]
+    print "Y\t%f" % shift[1]
 
     if zmin is not None:
         print "Z\t%f" % zmin
@@ -295,10 +375,7 @@ def main():
     if args.svg is not None:
         surface.finish()
 
-    if shift is None:
-        sys.exit(0)
-    else:
-        sys.exit(1)
+    sys.exit(1)
 
 
 if __name__ == "__main__":
