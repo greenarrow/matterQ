@@ -10,6 +10,8 @@ PIHOME ?= /home/pi
 
 INSTALL ?= install
 
+.PHONY: packages filter web sysconfig wifi imageprune imageclean
+
 packages:
 	# Installing system packages
 	apt-get update
