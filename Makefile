@@ -15,7 +15,8 @@ INSTALL ?= install
 packages:
 	# Installing system packages
 	apt-get update
-	apt-get install -y libncurses-dev wireless-tools usbutils lprng byobu
+	apt-get install -y libncurses-dev wireless-tools usbutils lprng byobu \
+		lighttpd
 
 filter:
 	# Installing matterQ lnrng filter
@@ -32,6 +33,7 @@ sysconfig:
 	$(INSTALL) -m 0644 config/printcap $(DESTDIR)$(ETCDIR)
 	$(INSTALL) -m 0644 config/lpd.conf $(DESTDIR)$(ETCDIR)/lprng
 	$(INSTALL) -m 0644 config/lpd.perms $(DESTDIR)$(ETCDIR)/lprng
+	$(INSTALL) -m 0755 config/lighttpd.conf $(DESTDIR)$(ETCDIR)
 	$(INSTALL) -m 0644 config/matterq.conf $(DESTDIR)$(BOOTDIR)
 	$(INSTALL) -m 0755 scripts/matterq.sh $(DESTDIR)$(ETCDIR)/profile.d
 
