@@ -16,7 +16,7 @@ packages:
 	# Installing system packages
 	apt-get update
 	apt-get install -y libncurses-dev wireless-tools usbutils lprng byobu \
-		lighttpd
+		lighttpd vim
 
 filter:
 	# Installing matterQ lnrng filter
