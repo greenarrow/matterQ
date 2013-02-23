@@ -1,4 +1,11 @@
+body {
+    font: 75% "Trebuchet MS", sans-serif;
+    margin: 50px;
+}
+
 table {
+    font: 75% "Trebuchet MS", sans-serif;
+    width: 100%;
     padding: 3px;
     margin: 0.8em;
     background: #f9f9f9;
@@ -15,8 +22,47 @@ table th, table th {
     background: #f2f2f2;
     text-align: center;
 }
-table caption{
+
+table caption {
     margin-left: inherit;
     margin-right: inherit;
+}
+
+hr {
+    border: none;
+    background-color: #ccc;
+    color: #ccc;
+    height: 1px;
+}
+
+#header {
+    width: 100%;
+    overflow: hidden;
+
+    padding: 0 10px;
+    font-size: 16px;
+    margin: 8px 0;
+    font-weight: normal;
+}
+
+#header h1, #header img {
+    float: left;
+    margin: 5px;
+}
+
+#footer {
+    clear: both;
+}
+
+#status {
+    float: left;
+    margin: 5px;
+    width: 20%;
+}
+
+#queue {
+    float: right;
+    margin: 5px;
+    width: 70%;
 }
 
