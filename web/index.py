@@ -61,7 +61,8 @@ def render_header(stream, autorefresh=False):
         stream.write("\t<body>\n")
 
     stream.write("\t\t<div id='header'>\n")
-    stream.write("\t\t\t<img src='/media/images/logo64.png'>\n")
+    stream.write("\t\t\t<a href='http://matterq.org'>")
+    stream.write("\t\t\t<img src='/media/images/logo64.png'></a>\n")
     stream.write("\t\t\t<h1>matterQ</h1>\n")
     stream.write("\t\t</div>\n")
 
