@@ -23,11 +23,17 @@ def render_header(stream):
     stream.write("\t\t<script type='text/javascript' src='/media/js/common.js'></script>\n")
     stream.write("\t</head>\n")
     stream.write("\t<body onload='auto_refresh(5000);'>\n")
-    stream.write("\t\t<h1>matterQ</h1>\n")
+    stream.write("\t\t<div id='header'>\n")
+    stream.write("\t\t\t<img src='media/images/logo64.png'>\n")
+    stream.write("\t\t\t<h1>matterQ</h1>\n")
+    stream.write("\t\t</div>\n")
 
 
 def render_footer(stream):
-    stream.write("\t<p><a href='http://matterq.org'>http://matterq.org</a></p>\n")
+    stream.write("\t\t<div id='footer'>\n")
+    stream.write("\t\t\t<hr />\n")
+    stream.write("\t\t\t<p><a href='http://matterq.org'>http://matterq.org</a></p>\n")
+    stream.write("\t\t</div>\n")
     stream.write("\t</body>\n")
     stream.write("</html>\n")
 
@@ -85,11 +91,15 @@ def index(stream):
 
     render_header(stream)
 
-    stream.write("\t\t<h2>Status</h2>\n")
-    render_status(stream, "\t\t")
+    stream.write("\t\t<div id='status'>\n")
+    stream.write("\t\t\t<h2>Status</h2>\n")
+    render_status(stream, "\t\t\t")
+    stream.write("\t\t</div>\n")
 
-    stream.write("\t\t<h2>Queue</h2>\n")
-    render_queue(stream, out, "\t\t")
+    stream.write("\t\t<div id='queue'>\n")
+    stream.write("\t\t\t<h2>Queue</h2>\n")
+    render_queue(stream, out, "\t\t\t")
+    stream.write("\t\t</div>\n")
 
     render_footer(stream)
 
