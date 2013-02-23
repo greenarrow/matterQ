@@ -33,6 +33,7 @@ web:
 	$(INSTALL) -m 0755 web/index.py $(DESTDIR)$(VARDIR)/www/cgi-bin
 	$(INSTALL) -m 0644 web/media/css/style.css $(DESTDIR)$(VARDIR)/www/media/css
 	$(INSTALL) -m 0644 web/media/js/common.js $(DESTDIR)$(VARDIR)/www/media/js
+	$(INSTALL) -m 0644 web/media/images/logo64.png $(DESTDIR)$(VARDIR)/www/media/images
 	$(INSTALL) -m 0644 web/media/images/tick32.png $(DESTDIR)$(VARDIR)/www/media/images
 	$(INSTALL) -m 0644 web/media/images/stop32.png $(DESTDIR)$(VARDIR)/www/media/images
 
