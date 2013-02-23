@@ -15,16 +15,21 @@ def load_config():
             os.environ[parts[0]] = parts[1].strip()
 
 
-def render_header(stream):
+def render_header(stream, autorefresh=False):
     stream.write("<html>\n")
     stream.write("\t<head>\n")
     stream.write("\t\t<title>matterQ</title>\n")
     stream.write("\t\t<link type='text/css' rel='stylesheet' href='/media/css/style.css' />\n")
     stream.write("\t\t<script type='text/javascript' src='/media/js/common.js'></script>\n")
     stream.write("\t</head>\n")
-    stream.write("\t<body onload='auto_refresh(5000);'>\n")
+
+    if autorefresh:
+        stream.write("\t<body onload='auto_refresh(5000);'>\n")
+    else:
+        stream.write("\t<body>\n")
+
     stream.write("\t\t<div id='header'>\n")
-    stream.write("\t\t\t<img src='media/images/logo64.png'>\n")
+    stream.write("\t\t\t<img src='/media/images/logo64.png'>\n")
     stream.write("\t\t\t<h1>matterQ</h1>\n")
     stream.write("\t\t</div>\n")
 
@@ -60,8 +65,11 @@ def render_queue(stream, out, indent=""):
     stream.write("%s<table>\n" % indent)
 
     for line in out.split("\n"):
+        items = line.split()
+
         if line.startswith(" Rank   Owner/ID"):
             active = True
+            job_index = items.index("Job")
             col = "th"
         else:
             col = "td"
@@ -71,7 +79,12 @@ def render_queue(stream, out, indent=""):
 
         stream.write("%s\t<tr>\n" % indent)
 
-        for item in line.split():
+        if col == "th":
+            items.append("")
+        else:
+            items.append("<a href='/cancel/%s'>cancel</a>" % items[job_index])
+
+        for item in items:
             stream.write("%s\t\t<%s>%s</%s>\n" % (indent, col, item, col))
 
         stream.write("%s\t</tr>\n" % indent)
@@ -89,7 +102,7 @@ def index(stream):
     assert p.wait() == 0
     out = p.communicate()[0]
 
-    render_header(stream)
+    render_header(stream, autorefresh=True)
 
     stream.write("\t\t<div id='status'>\n")
     stream.write("\t\t\t<h2>Status</h2>\n")
@@ -104,18 +117,34 @@ def index(stream):
     render_footer(stream)
 
 
+def remove(stream, job):
+    render_header(stream)
+
+    p = subprocess.Popen(["/usr/bin/lprm", job])
+
+    if p.wait() == 0:
+        stream.write("\t\t<p>Job %s cancelled. " % job)
+    else:
+        stream.write("\t\t<p>Failed to cancel job %s." % job)
+
+    stream.write("<a href='/'>Return to main page.</a></p>")
+    render_footer(stream)
+
+
 if __name__ == "__main__":
     load_config()
 
     cgitb.enable()
 
-    #form = cgi.FieldStorage() 
-    #sid = form.getvalue('id')
-    #sval = form.getvalue('value')
+    form = cgi.FieldStorage() 
+    cancel = form.getvalue('cancel')
 
     stream = sys.stdout
 
     stream.write("Content-type: text/html\n\n")
 
-    index(stream)
+    if cancel is not None:
+        remove(stream, cancel)
+    else:
+        index(stream)
 
