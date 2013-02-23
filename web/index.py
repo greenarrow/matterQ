@@ -15,6 +15,38 @@ def load_config():
             os.environ[parts[0]] = parts[1].strip()
 
 
+def read_status(msg):
+    status = None
+
+    for line in msg.split("\n"):
+        if line.startswith(" Status:"):
+            match = re.match(r" Status: LP filter msg - '(.*?)' at ([0-9:.]+)",
+                             line)
+            if match:
+                status = match.groups()[0]
+
+    return status
+
+
+def read_active_job(msg):
+    active = False
+
+    for line in msg.split("\n"):
+        items = line.split()
+
+        if line.startswith(" Rank   Owner/ID"):
+            active = True
+            job_index = items.index("Job")
+
+        if not active or len(line) == 0:
+            continue
+
+        if items[0] == "active":
+            return items[job_index]
+
+    return None
+
+
 def render_header(stream, autorefresh=False):
     stream.write("<html>\n")
     stream.write("\t<head>\n")
@@ -43,7 +75,7 @@ def render_footer(stream):
     stream.write("</html>\n")
 
 
-def render_status(stream, indent=""):
+def render_status(stream, out, indent=""):
     serial = os.environ.get("AG_SERIALPORT")
     if serial is None:
         stream.write("%s<p><img src='/media/images/stop32.png'> " % indent)
@@ -52,6 +84,14 @@ def render_status(stream, indent=""):
         if os.path.exists(serial):
             stream.write("%s<p><img src='/media/images/tick32.png'>" % indent)
             stream.write(" Printer is connected.</p>\n")
+
+            job = read_active_job(out)
+            if job is None:
+                status = "waiting"
+            else:
+                status = read_status(out)
+
+            stream.write("%s<p>Status: %s</p>\n" % (indent, status))
         else:
             stream.write("%s<p><img src='/media/images/stop32.png'> " % indent)
             stream.write(" Printer is not connected.<br />\n")
@@ -98,7 +138,7 @@ def render_queue(stream, out, indent=""):
 
 def index(stream):
 
-    p = subprocess.Popen(["/usr/bin/lpq", "-l"], stdout=subprocess.PIPE)
+    p = subprocess.Popen(["/usr/bin/lpq", "-lll"], stdout=subprocess.PIPE)
     assert p.wait() == 0
     out = p.communicate()[0]
 
@@ -106,7 +146,7 @@ def index(stream):
 
     stream.write("\t\t<div id='status'>\n")
     stream.write("\t\t\t<h2>Status</h2>\n")
-    render_status(stream, "\t\t\t")
+    render_status(stream, out, "\t\t\t")
     stream.write("\t\t</div>\n")
 
     stream.write("\t\t<div id='queue'>\n")
