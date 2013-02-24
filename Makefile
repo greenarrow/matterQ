@@ -11,7 +11,7 @@ PIHOME ?= /home/pi
 
 INSTALL ?= install
 
-.PHONY: packages filter web sysconfig wifi imageprune imageclean
+.PHONY: packages install filter web sysconfig wifi imageprune imageclean
 
 packages:
 	# Installing system packages
@@ -57,6 +57,8 @@ sysconfig:
 	usermod -a -G dialout pi
 	usermod -a -G dialout daemon
 
+install: filter web sysconfig
+
 wifi:
 	# WiFi configuration
 	$(INSTALL) -d $(DESTDIR)$(ETCDIR)/wpa_supplicant
@@ -74,7 +76,7 @@ imageprune:
 	apt-get clean
 
 	rm -fR /opt/vc
- 
+
 imageclean:
 	apt-get clean
 
@@ -88,7 +90,4 @@ imageclean:
 	find /var/log -type f | xargs rm
 
 	rm -f $(PIHOME)/.bash_history
-
-install: filter sysconfig packages
-
 
