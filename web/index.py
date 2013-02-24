@@ -47,6 +47,20 @@ def read_active_job(msg):
     return None
 
 
+def pretty_size(value):
+    suffix = ("K", "M", "G", "T")
+
+    if value < 1024.0:
+        return str(value)
+
+    for s in suffix:
+        value = value / 1024.0
+        if value < 1024.0:
+            break
+
+    return "%.1f%s" % (value, s)
+
+
 def render_header(stream, autorefresh=False):
     stream.write("<html>\n")
     stream.write("\t<head>\n")
@@ -100,41 +114,53 @@ def render_status(stream, out, indent=""):
 
 
 def render_queue(stream, out, indent=""):
+    re_job = re.compile(r"^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+(\d+)\s+(.+?)\s+(\d+)\s+([0-9:]+)$")
+
     active = False
     tally = 0
 
-    stream.write("%s<table>\n" % indent)
+    jobs = []
 
     for line in out.split("\n"):
-        items = line.split()
-
-        if line.startswith(" Rank   Owner/ID"):
-            active = True
-            job_index = items.index("Job")
-            col = "th"
-        else:
-            col = "td"
-
-        if not active or len(line) == 0:
+        if len(line) == 0:
             continue
 
+        match = re_job.match(line)
+        if match is None:
+            continue
+
+        jobs.append(match.groups())
+
+    if len(jobs) == 0:
+        stream.write("%s<p>No jobs found</p>\n" % indent)
+        return
+
+    stream.write("%s<table>\n" % indent)
+    stream.write("%s\t<tr>\n" % indent)
+    stream.write("%s\t\t<th>Rank</th>\n" % indent)
+    stream.write("%s\t\t<th>Owner</th>\n" % indent)
+    stream.write("%s\t\t<th>Class</th>\n" % indent)
+    stream.write("%s\t\t<th>Job</th>\n" % indent)
+    stream.write("%s\t\t<th>Files</th>\n" % indent)
+    stream.write("%s\t\t<th>Size</th>\n" % indent)
+    stream.write("%s\t\t<th>Time</th>\n" % indent)
+    stream.write("%s\t\t<th><br /></th>\n" % indent)
+    stream.write("%s\t</tr>\n" % indent)
+
+    for items in jobs:
         stream.write("%s\t<tr>\n" % indent)
+        items += ("<a href='/cancel/%s'>cancel</a>" % items[3],)
 
-        if col == "th":
-            items.append("")
-        else:
-            items.append("<a href='/cancel/%s'>cancel</a>" % items[job_index])
+        for i, item in enumerate(items):
+            if i == 5:
+                item = pretty_size(float(item))
 
-        for item in items:
-            stream.write("%s\t\t<%s>%s</%s>\n" % (indent, col, item, col))
+            stream.write("%s\t\t<td>%s</td>\n" % (indent, item))
 
         stream.write("%s\t</tr>\n" % indent)
-        tally += 1
 
     stream.write("%s</table>\n" % indent)
 
-    if tally == 0:
-        stream.write("%s<p>No jobs found</p>\n" % indent)
 
 
 def index(stream):
