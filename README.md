@@ -14,7 +14,7 @@ This guide explains how the matterQ SD card image is built.
 
 ### Installing the Standard Raspbian Image
 
-The matterQ image is currently based on the "2012-09-18-wheezy-raspbian" image.
+The matterQ image is currently based on the "2013-02-09-wheezy-raspbian" image.
 
 We start with the standard image and apply several customisations to turn it
 into a function 3D print server.
@@ -23,7 +23,7 @@ into a function 3D print server.
     [Raspberry Pi downloads page](http://www.raspberrypi.org/downloads)
     and download the following image:
  
-        2012-09-18-wheezy-raspbian.zip
+        2013-02-09-wheezy-raspbian.zip
 
 3.  Write the image to an SD card following the
     [Raspberry Pi guide](http://elinux.org/RPi_Easy_SD_Card_Setup)
@@ -48,8 +48,7 @@ Steps 1 to 5 are performed on the Raspberry Pi board after connecting by SSH.
         $ git clone https://github.com/greenarrow/matterQ.git
         $ cd matterQ
         $ sudo make packages
-        $ sudo make filter
-        $ sudo make sysconfig
+        $ sudo make install
 
     This step can be skipped if WiFi is not requied.
 
@@ -85,8 +84,10 @@ Steps 1 to 5 are performed on the Raspberry Pi board after connecting by SSH.
         $ umount /dev/sdxx2
         $ sudo dd if=/dev/sdxx of=FILENAME.img count=3788800
         $ sudo mkdir -p /mnt/tmp
+        $ sudo sync
         $ sudo mount -o loop,offset=$((512*122880)) FILENAME.img /mnt/tmp
         $ sudo sfill -z -l -l -f /mnt/tmp
+        $ sudo sync
         $ sudo umount /mnt/tmp
         $ zip FILENAME.zip FILENAME.img
 
