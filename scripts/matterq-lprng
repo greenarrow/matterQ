@@ -1,5 +1,15 @@
 #!/bin/bash
 
+plan()
+{
+    matterq-planner --svg $MQ_SPOOLDIR/plate/images/current.svg $1
+    RC=$?
+    rsvg $MQ_SPOOLDIR/plate/images/current.svg \
+         $MQ_SPOOLDIR/plate/images/current.png
+    chmod 0666 $MQ_SPOOLDIR/plate/images/current.png
+}
+
+
 #echo DFC=$datafile_count > /tmp/fs
 #if [ "$datafile_count" -gt 1 ]; then
 #    echo "multiple data files not supported" >&2
@@ -8,13 +18,30 @@
 
 source /etc/profile.d/matterq.sh
 
+echo "planning print"
+
+plan $SPOOL_DIR/$DATAFILES
+
+if [ "$RC" -ne 0 ]
+then
+    plan
+
+    echo "print bed full"
+    exit 1
+fi
+
+DEPFILE=`mktemp --tmpdir="$MQ_SPOOLDIR/plate/depositions"`
+austerus-verge -d -p $SPOOL_DIR/$DATAFILES > $DEPFILE
+
 echo "processing gcode"
 
 austerus-send -s $SPOOL_DIR/$DATAFILES
 
 echo "finished"
 
-if [ "$?" -eq 0 ]; then
+plan
+
+if [ "$RC" -eq 0 ]; then
     exit 0
 else
     exit 2
