@@ -27,6 +27,8 @@ filter:
 	$(INSTALL) -o daemon -g lp -d -m 0777 $(DESTDIR)$(VARDIR)/spool/matterq/plate/depositions
 	$(INSTALL) -m 0755 scripts/matterq-lprng \
 		$(DESTDIR)$(EXEDIR)/filters
+	$(INSTALL) -m 0755 scripts/matterq-planner \
+		$(DESTDIR)$(BINDIR)
 
 web:
 	$(INSTALL) -d $(DESTDIR)$(VARDIR)/www/cgi-bin
