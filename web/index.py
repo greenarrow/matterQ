@@ -192,19 +192,38 @@ def remove(stream, job):
     if p.wait() == 0:
         stream.write("\t\t<p>Job %s cancelled. " % job)
     else:
-        stream.write("\t\t<p>Failed to cancel job %s." % job)
+        stream.write("\t\t<p>Failed to cancel job %s. " % job)
 
     stream.write("<a href='/'>Return to main page.</a></p>")
     render_footer(stream)
 
+
+def clear_bed(stream):
+    render_header(stream)
+
+    path = os.path.join(os.environ["MQ_SPOOLDIR"], "plate", "depositions")
+    cleared = False
+
+    for name in os.listdir(path):
+        cleared = True
+        os.remove(os.path.join(path, name))
+
+    if cleared:
+        stream.write("\t\t<p>Print bed cleared. ")
+    else:
+        stream.write("\t\t<p>Nothing to clear. ")
+
+    stream.write("<a href='/'>Return to main page.</a></p>")
+    render_footer(stream)
 
 if __name__ == "__main__":
     load_config()
 
     cgitb.enable()
 
-    form = cgi.FieldStorage() 
+    form = cgi.FieldStorage()
     cancel = form.getvalue('cancel')
+    clear = form.getvalue('clear')
 
     stream = sys.stdout
 
@@ -212,6 +231,8 @@ if __name__ == "__main__":
 
     if cancel is not None:
         remove(stream, cancel)
+    elif clear is not None:
+        clear_bed(stream)
     else:
         index(stream)
 
