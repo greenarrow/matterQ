@@ -6,7 +6,8 @@
 Jobs can be submitted to **matterQ** from any computer on the local network
 and **matterQ** will store and print the gcode.
 
-See the [matterQ website](http://matterq.org) for more info on using matterQ.
+**This guide is about building matterQ from source. If you just want to use
+the prepared SD card image see the [matterQ website](http://matterq.org).**
 
 ## How to Build the matterQ SD Card Image
 
