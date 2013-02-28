@@ -1,0 +1,4 @@
+#!/bin/bash
+
+exec nice /usr/bin/python "$@"
+
