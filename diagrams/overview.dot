@@ -3,21 +3,19 @@ digraph G {
     node [style="rounded,filled", shape="box"]
 
     subgraph cluster_0 {
-        spooler [label="Spooler\n(lprng)"]
-        filters [label="Filters"]
-        austerusG
+        cura [label="Cura\n(LPR version)"]
+        browser [label="Web Interface"]
 
-        spooler -> filters
-        filters -> austerusG
-
-        label = "matterQ"
+        style=dashed
     }
 
-    file [label="Client\nComputer"]
+    matterq [label="matterQ\nServer", shape=box3d]
 
     firmware [label="3D Printer"]
 
-    file -> spooler [label="Local\nNetwork"]
-    austerusG -> firmware [label="Serial\nPort\n(USB)"]
+    cura -> matterq [label="gcode"]
+    matterq -> browser [label="status"]
+
+    matterq -> firmware [label="gcode"]
 }
 
