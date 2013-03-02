@@ -61,8 +61,8 @@ Steps 1 to 5 are performed on the Raspberry Pi board after connecting by SSH.
         $ git clone https://github.com/greenarrow/austerusG.git
         $ cd austerusG
         $ git checkout `git describe --abbrev=0`
-        $ make
-        $ sudo make install
+        $ make SETUID=1
+        $ sudo make SETUID=1 install
 
     **If just want to use matterQ on your device and do not wish to create an
     SD card image then you can stop here.**
