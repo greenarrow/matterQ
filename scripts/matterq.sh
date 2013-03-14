@@ -8,6 +8,8 @@ export AG_BAUDRATE
 export AG_VERBOSE
 export AG_DUMP
 
+export MQ_SPOOLDIR
+
 export MQ_HEADSIZE
 export MQ_PRINTBED
 
