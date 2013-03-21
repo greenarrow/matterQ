@@ -31,12 +31,14 @@ filter:
 		$(DESTDIR)$(BINDIR)
 
 web:
+	$(INSTALL) -d $(DESTDIR)$(VARDIR)/www
 	$(INSTALL) -d $(DESTDIR)$(VARDIR)/www/cgi-bin
 	$(INSTALL) -d $(DESTDIR)$(VARDIR)/www/media/css
 	$(INSTALL) -d $(DESTDIR)$(VARDIR)/www/media/js
 	$(INSTALL) -d $(DESTDIR)$(VARDIR)/www/media/images
 	$(INSTALL) -m 0755 scripts/nice-python $(DESTDIR)$(BINDIR)
 	$(INSTALL) -m 0755 web/index.py $(DESTDIR)$(VARDIR)/www/cgi-bin
+	$(INSTALL) -m 0644 web/index.html $(DESTDIR)$(VARDIR)/www
 	$(INSTALL) -m 0644 web/media/css/style.css $(DESTDIR)$(VARDIR)/www/media/css
 	$(INSTALL) -m 0644 web/media/css/1140.css $(DESTDIR)$(VARDIR)/www/media/css
 	$(INSTALL) -m 0644 web/media/js/common.js $(DESTDIR)$(VARDIR)/www/media/js
