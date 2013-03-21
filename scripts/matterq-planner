@@ -8,7 +8,7 @@ import traceback
 import cairo
 
 MQ_SPOOLDIR = os.environ["MQ_SPOOLDIR"]
-PLATE_PATH = os.path.join(MQ_SPOOLDIR, "plate", "depositions")
+PLATE_PATH = os.path.join(MQ_SPOOLDIR, "depositions")
 
 
 class Region(object):
