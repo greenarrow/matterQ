@@ -22,9 +22,9 @@ packages:
 filter:
 	# Installing matterQ lnrng filter
 	$(INSTALL) -d $(DESTDIR)$(EXEDIR)/filters
-	$(INSTALL) -o daemon -g lp -d -m 0755 $(DESTDIR)$(VARDIR)/spool/matterq
-	$(INSTALL) -o daemon -g lp -d -m 0755 $(DESTDIR)$(VARDIR)/spool/matterq/plate
-	$(INSTALL) -o daemon -g lp -d -m 0777 $(DESTDIR)$(VARDIR)/spool/matterq/plate/depositions
+	$(INSTALL) -o daemon -g lp -d -m 0755 $(DESTDIR)$(VARDIR)/spool/lpd/lp/matterq
+	$(INSTALL) -o daemon -g lp -d -m 0777 $(DESTDIR)$(VARDIR)/spool/lpd/lp/matterq/depositions
+	$(INSTALL) -o daemon -g lp -d -m 0777 $(DESTDIR)$(VARDIR)/spool/lpd/lp/matterq/images
 	$(INSTALL) -m 0755 scripts/matterq-lprng \
 		$(DESTDIR)$(EXEDIR)/filters
 	$(INSTALL) -m 0755 scripts/matterq-planner \
