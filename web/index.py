@@ -6,6 +6,10 @@ import subprocess
 import re
 import cgi
 import cgitb
+import json
+
+
+re_job = re.compile(r"^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+(\d+)\s+(.+?)\s+(\d+)\s+([0-9:]+)$")
 
 
 def load_config():
@@ -61,43 +65,18 @@ def pretty_size(value):
     return "%.1f%s" % (value, s)
 
 
-def render_header(stream, autorefresh=False):
-    stream.write("<html>\n")
-    stream.write("\t<head>\n")
-    stream.write("\t\t<title>matterQ</title>\n")
-    stream.write("\t\t<link type='text/css' rel='stylesheet' href='/media/css/style.css' />\n")
-    stream.write("\t\t<script type='text/javascript' src='/media/js/common.js'></script>\n")
-    stream.write("\t</head>\n")
+def render_status(stream, form):
+    p = subprocess.Popen(["/usr/bin/lpq", "-lll"], stdout=subprocess.PIPE)
+    assert p.wait() == 0
+    out = p.communicate()[0]
 
-    if autorefresh:
-        stream.write("\t<body onload='auto_refresh(5000);'>\n")
-    else:
-        stream.write("\t<body>\n")
-
-    stream.write("\t\t<div id='header'>\n")
-    stream.write("\t\t\t<a href='http://matterq.org'>")
-    stream.write("\t\t\t<img src='/media/images/logo64.png'></a>\n")
-    stream.write("\t\t\t<h1>matterQ</h1>\n")
-    stream.write("\t\t</div>\n")
-
-
-def render_footer(stream):
-    stream.write("\t\t<div id='footer'>\n")
-    stream.write("\t\t\t<hr />\n")
-    stream.write("\t\t\t<p><a href='http://matterq.org'>http://matterq.org</a></p>\n")
-    stream.write("\t\t</div>\n")
-    stream.write("\t</body>\n")
-    stream.write("</html>\n")
-
-
-def render_status(stream, out, indent=""):
     serial = os.environ.get("AG_SERIALPORT")
     if serial is None:
-        stream.write("%s<p><img src='/media/images/stop32.png'> " % indent)
+        stream.write("<p><img src='/media/images/stop32.png'> ")
         stream.write("Printer is not configured.</p>\n")
     else:
         if os.path.exists(serial):
-            stream.write("%s<p><img src='/media/images/tick32.png'>" % indent)
+            stream.write("<p><img src='/media/images/tick32.png'>")
             stream.write(" Printer is connected.</p>\n")
 
             job = read_active_job(out)
@@ -106,15 +85,23 @@ def render_status(stream, out, indent=""):
             else:
                 status = read_status(out)
 
-            stream.write("%s<p>Status: %s</p>\n" % (indent, status))
+            stream.write("<p>Status: %s</p>\n" % status)
         else:
-            stream.write("%s<p><img src='/media/images/stop32.png'> " % indent)
+            stream.write("<p><img src='/media/images/stop32.png'> ")
             stream.write(" Printer is not connected.<br />\n")
-            stream.write("%s<i>Device: %s</i></p>\n" % (indent, serial))
+            stream.write("<i>Device: %s</i></p>\n" % serial)
 
 
-def render_queue(stream, out, indent=""):
-    re_job = re.compile(r"^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+(\d+)\s+(.+?)\s+(\d+)\s+([0-9:]+)$")
+def render_queue(stream, form):
+    queue = form.getvalue("queue")
+    if queue is None:
+        stream.write("queue required")
+        return
+
+    p = subprocess.Popen(["/usr/bin/lpq", "-lll"], stdout=subprocess.PIPE)
+    assert p.wait() == 0
+    out = p.communicate()[0]
+
 
     active = False
     tally = 0
@@ -132,107 +119,134 @@ def render_queue(stream, out, indent=""):
         jobs.append(match.groups())
 
     if len(jobs) == 0:
-        stream.write("%s<p>No jobs found</p>\n" % indent)
+        stream.write("<p>No jobs found</p>\n")
         return
 
-    stream.write("%s<table>\n" % indent)
-    stream.write("%s\t<tr>\n" % indent)
-    stream.write("%s\t\t<th>Rank</th>\n" % indent)
-    stream.write("%s\t\t<th>Owner</th>\n" % indent)
-    stream.write("%s\t\t<th>Class</th>\n" % indent)
-    stream.write("%s\t\t<th>Job</th>\n" % indent)
-    stream.write("%s\t\t<th>Files</th>\n" % indent)
-    stream.write("%s\t\t<th>Size</th>\n" % indent)
-    stream.write("%s\t\t<th>Time</th>\n" % indent)
-    stream.write("%s\t\t<th><br /></th>\n" % indent)
-    stream.write("%s\t</tr>\n" % indent)
+    stream.write("<table>\n")
+    stream.write("\t<tr>\n")
+    stream.write("\t\t<th>Job</th>\n")
+    stream.write("\t\t<th>State</th>\n")
+    stream.write("\t\t<th>Files</th>\n")
+    stream.write("\t\t<th><br /></th>\n")
+    stream.write("\t\t<th><br /></th>\n")
+    stream.write("\t</tr>\n")
 
     for items in jobs:
-        stream.write("%s\t<tr>\n" % indent)
-        items += ("<a href='/cancel/%s'>cancel</a>" % items[3],)
+        stream.write("\t<tr>\n")
 
-        for i, item in enumerate(items):
-            if i == 5:
-                item = pretty_size(float(item))
+        for i in (3, 0, 4):
+            stream.write("\t\t<td>%s</td>\n" % items[i])
 
-            stream.write("%s\t\t<td>%s</td>\n" % (indent, item))
+        stream.write("\t\t<td><a class='detail' "
+                     "href='/ajax/%s/detail/%s'>detail</a></td>" % \
+                     (queue, items[3]))
 
-        stream.write("%s\t</tr>\n" % indent)
+        stream.write("\t\t<td><a class='cancel' "
+                     "href='/ajax/%s/cancel/%s'>cancel</a></td>" % \
+                     (queue, items[3]))
 
-    stream.write("%s</table>\n" % indent)
+        stream.write("\t</tr>\n")
+
+    stream.write("</table>\n")
 
 
+def render_detail(stream, form):
+    queue = form.getvalue("queue")
+    job = form.getvalue("job")
 
-def index(stream):
+    if queue is None:
+        stream.write("queue required")
+        return
 
-    p = subprocess.Popen(["/usr/bin/lpq", "-lll"], stdout=subprocess.PIPE)
+    if job is None:
+        stream.write("job required")
+        return
+
+    p = subprocess.Popen(["/usr/bin/lpq", job], stdout=subprocess.PIPE)
     assert p.wait() == 0
     out = p.communicate()[0]
 
-    render_header(stream, autorefresh=True)
+    items = None
 
-    stream.write("\t\t<div id='status'>\n")
-    stream.write("\t\t\t<h2>Status</h2>\n")
-    render_status(stream, out, "\t\t\t")
-    stream.write("\t\t</div>\n")
+    for line in out.split("\n"):
+        if len(line) == 0:
+            continue
 
-    stream.write("\t\t<div id='queue'>\n")
-    stream.write("\t\t\t<h2>Queue</h2>\n")
-    render_queue(stream, out, "\t\t\t")
-    stream.write("\t\t</div>\n")
+        match = re_job.match(line)
+        if match is None:
+            continue
 
-    render_footer(stream)
+        items = match.groups()
+
+    if items is None:
+        stream.write("no such job")
+        return
+
+    titles = ("Rank", "Owner", "Class", "Job", "Files", "Size", "Time")
+
+    assert len(items) == len(titles)
+
+    for i in range(len(titles)):
+        stream.write("%s: %s\n" % (titles[i], items[i]))
 
 
-def remove(stream, job):
-    render_header(stream)
+def remove(stream, form):
+    job = form.getvalue("job")
+
+    if job is None:
+        stream.write("false")
+        return
 
     p = subprocess.Popen(["/usr/bin/lprm", job])
 
     if p.wait() == 0:
-        stream.write("\t\t<p>Job %s cancelled. " % job)
+        stream.write("true")
     else:
-        stream.write("\t\t<p>Failed to cancel job %s. " % job)
-
-    stream.write("<a href='/'>Return to main page.</a></p>")
-    render_footer(stream)
+        stream.write("false")
 
 
-def clear_bed(stream):
-    render_header(stream)
-
-    path = os.path.join(os.environ["MQ_SPOOLDIR"], "plate", "depositions")
+def clear_bed(stream, form):
+    path = os.path.join(os.environ["MQ_SPOOLDIR"], "depositions")
     cleared = False
 
     for name in os.listdir(path):
         cleared = True
         os.remove(os.path.join(path, name))
 
-    if cleared:
-        stream.write("\t\t<p>Print bed cleared. ")
-    else:
-        stream.write("\t\t<p>Nothing to clear. ")
+    cmd = "matterq-planner --svg $MQ_SPOOLDIR/images/current.svg && \
+           rsvg $MQ_SPOOLDIR/images/current.svg \
+                $MQ_SPOOLDIR/images/current.png"
 
-    stream.write("<a href='/'>Return to main page.</a></p>")
-    render_footer(stream)
+    subprocess.Popen([cmd], shell=True).wait()
+
+    if cleared:
+        stream.write("true")
+    else:
+        stream.write("false")
+
 
 if __name__ == "__main__":
-    load_config()
-
     cgitb.enable()
 
-    form = cgi.FieldStorage()
-    cancel = form.getvalue('cancel')
-    clear = form.getvalue('clear')
+    load_config()
 
     stream = sys.stdout
-
     stream.write("Content-type: text/html\n\n")
 
-    if cancel is not None:
-        remove(stream, cancel)
-    elif clear is not None:
-        clear_bed(stream)
-    else:
-        index(stream)
+    form = cgi.FieldStorage()
 
+    ajax = form.getvalue("ajax")
+    if ajax == "status":
+        render_status(stream, form)
+
+    elif ajax == "queue":
+        render_queue(stream, form)
+
+    elif ajax == "detail":
+        render_detail(stream, form)
+
+    elif ajax == "cancel":
+        remove(stream, form)
+
+    elif ajax == "clear":
+        clear_bed(stream, form)
