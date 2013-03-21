@@ -2,11 +2,11 @@
 
 plan()
 {
-    matterq-planner --svg $MQ_SPOOLDIR/plate/images/current.svg $1
+    matterq-planner --svg $SPOOL_DIR/matterq/images/current.svg $1
     RC=$?
-    rsvg $MQ_SPOOLDIR/plate/images/current.svg \
-         $MQ_SPOOLDIR/plate/images/current.png
-    chmod 0666 $MQ_SPOOLDIR/plate/images/current.png
+    rsvg $SPOOL_DIR/matterq/images/current.svg \
+         $SPOOL_DIR/matterq/images/current.png
+    chmod 0666 $SPOOL_DIR/matterq/images/current.png
 }
 
 
@@ -30,7 +30,7 @@ then
     exit 1
 fi
 
-DEPFILE=`mktemp --tmpdir="$MQ_SPOOLDIR/plate/depositions"`
+DEPFILE=`mktemp --tmpdir="$SPOOL_DIR/matterq/depositions"`
 austerus-verge -d -p $SPOOL_DIR/$DATAFILES > $DEPFILE
 
 echo "processing gcode"
