@@ -10,6 +10,7 @@ import json
 
 
 re_job = re.compile(r"^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+(\d+)\s+(.+?)\s+(\d+)\s+([0-9:]+)$")
+re_status = re.compile(r" Status: LP filter msg - '(.*?)' at ([0-9:.]+)")
 
 
 def load_config():
@@ -24,8 +25,7 @@ def read_status(msg):
 
     for line in msg.split("\n"):
         if line.startswith(" Status:"):
-            match = re.match(r" Status: LP filter msg - '(.*?)' at ([0-9:.]+)",
-                             line)
+            match = re_status.match(line)
             if match:
                 status = match.groups()[0]
 
