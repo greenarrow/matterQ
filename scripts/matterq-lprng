@@ -6,6 +6,7 @@ plan()
     RC=$?
     rsvg $SPOOL_DIR/matterq/images/current.svg \
          $SPOOL_DIR/matterq/images/current.png
+    chmod 0666 $SPOOL_DIR/matterq/images/current.svg
     chmod 0666 $SPOOL_DIR/matterq/images/current.png
 }
 
