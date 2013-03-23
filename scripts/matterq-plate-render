@@ -1,0 +1,11 @@
+#!/bin/bash
+
+matterq-planner --svg $MQ_SPOOLDIR/images/current.svg $1
+RC=$?
+
+rsvg $MQ_SPOOLDIR/images/current.svg \
+     $MQ_SPOOLDIR/images/current.png
+
+chmod 0666 $MQ_SPOOLDIR/images/current.png
+
+exit $RC

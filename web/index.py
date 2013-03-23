@@ -216,11 +216,7 @@ def clear_bed(stream, form):
         cleared = True
         os.remove(os.path.join(path, name))
 
-    cmd = "matterq-planner --svg $MQ_SPOOLDIR/images/current.svg && \
-           rsvg $MQ_SPOOLDIR/images/current.svg \
-                $MQ_SPOOLDIR/images/current.png"
-
-    subprocess.Popen([cmd], shell=True).wait()
+    subprocess.Popen(["/usr/local/bin/matterq-plate-render"]).wait()
 
     if cleared:
         stream.write("true")
