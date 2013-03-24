@@ -217,6 +217,7 @@ def clear_bed(stream, form):
         os.remove(os.path.join(path, name))
 
     subprocess.Popen(["/usr/local/bin/matterq-plate-render"]).wait()
+    subprocess.Popen(["/usr/sbin/lpc", "release", "lp", "all"]).wait()
 
     if cleared:
         stream.write("true")
