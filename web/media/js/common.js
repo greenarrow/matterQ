@@ -9,8 +9,9 @@ $(document).ready(function() {
 
         $("a.cancel").click(function() {
             $.get($(this).attr("href"), function(data) {
-                alert(data);
                 reload();
+                if (data != "true")
+                    alert("Failed to cancel");
             });
             return false;
         });
