@@ -5,9 +5,12 @@ import sys
 import subprocess
 import re
 import cgi
-import cgitb
-import json
 
+
+DEBUG = False
+
+if DEBUG:
+    import cgitb
 
 re_job = re.compile(r"^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+(\d+)\s+(.+?)\s+(\d+)\s+([0-9:]+)$")
 re_status = re.compile(r" Status: LP filter msg - '(.*?)' at ([0-9:.]+)")
@@ -226,7 +229,8 @@ def clear_bed(stream, form):
 
 
 if __name__ == "__main__":
-    cgitb.enable()
+    if DEBUG:
+        cgitb.enable()
 
     load_config()
 
