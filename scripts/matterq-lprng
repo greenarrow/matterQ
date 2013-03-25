@@ -1,9 +1,16 @@
 #!/bin/bash
 
+set -e
+set -o pipefail
+
+
 plan()
 {
+    set +e
     matterq-planner --svg $SPOOL_DIR/matterq/images/current.svg $1
     RC=$?
+    set -e
+
     rsvg $SPOOL_DIR/matterq/images/current.svg \
          $SPOOL_DIR/matterq/images/current.png
     chmod 0666 $SPOOL_DIR/matterq/images/current.svg
@@ -21,20 +28,47 @@ source /etc/profile.d/matterq.sh
 
 echo "planning print"
 
-plan $SPOOL_DIR/$DATAFILES
+SHIFT=`plan $SPOOL_DIR/$DATAFILES`
+RC=$?
 
-if [ "$RC" -ne 0 ]
-then
-    echo "print bed full"
-    exit 1
-fi
+case "$RC" in
+    0)
+        GCODE="$SPOOL_DIR/$DATAFILES"
+        ;;
+    1)
+        DX=`cat $SHIFT | grep '^X' | awk '{print $2}'`
+        DY=`cat $SHIFT | grep '^Y' | awk '{print $2}'`
+        ZMIN=`cat $SHIFT | grep '^Z' | awk '{print $2}'`
+
+        GCODE=`mktemp`
+        cat "$SPOOL_DIR/$DATAFILES" |
+            austerus-shift -x "$DX" -y "$DY" -z "$ZMIN" > "$GCODE"
+
+        if [ "$?" -ne 0 ]
+        then
+            echo "shift failed"
+            exit 1
+        fi
+
+        plan $SPOOL_DIR/$DATAFILES
+
+        if [ "$?" -ne 0 ]
+        then
+            echo "shift replan failed"
+            exit 1
+        fi
+        ;;
+    *)
+        exit 2
+esac
 
 DEPFILE=`mktemp --tmpdir="$SPOOL_DIR/matterq/depositions"`
-austerus-verge -d -p $SPOOL_DIR/$DATAFILES > $DEPFILE
+austerus-verge -d -p "$GCODE" > "$DEPFILE"
 
 echo "processing gcode"
 
-austerus-send -s $SPOOL_DIR/$DATAFILES
+austerus-send -s $GCODE
+RC=$?
 
 echo "finished"
 
