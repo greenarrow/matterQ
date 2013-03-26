@@ -55,7 +55,7 @@ class Region(object):
 
             limits[parts[0]] = (float(parts[1]), float(parts[2]))
 
-        assert set(limits.keys()) == set("XYZ")
+        #assert set(limits.keys()) == set("XYZ")
 
         return cls.from_dict(limits)
 
