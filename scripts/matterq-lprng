@@ -24,24 +24,34 @@ plan()
 #    exit 2
 #fi
 
-source /etc/profile.d/matterq.sh
+if [ "$MQ_TESTMODE" -ne 1 ]
+then
+    source /etc/profile.d/matterq.sh
+fi
+
+GCODE=`echo "$SPOOL_DIR/$DATAFILES" | sed 's/\s*$//g'`
 
 echo "planning print"
 
-SHIFT=`plan $SPOOL_DIR/$DATAFILES`
-RC=$?
+plan $GCODE
 
-case "$RC" in
+echo "plan=$PLANRC"
+
+case "$PLANRC" in
     0)
-        GCODE="$SPOOL_DIR/$DATAFILES"
+        GCODE="$GCODE"
         ;;
     1)
-        DX=`cat $SHIFT | grep '^X' | awk '{print $2}'`
-        DY=`cat $SHIFT | grep '^Y' | awk '{print $2}'`
-        ZMIN=`cat $SHIFT | grep '^Z' | awk '{print $2}'`
+        echo "preshift"
+        DX=`echo "$SHIFT" | grep '^X' | awk '{print $2}'`
+        DY=`echo "$SHIFT" | grep '^Y' | awk '{print $2}'`
+        ZMIN=`echo "$SHIFT" | grep '^Z' | awk '{print $2}'`
 
+	echo "shift"
+
+	OLDGCODE="$GCODE"
         GCODE=`mktemp`
-        cat "$SPOOL_DIR/$DATAFILES" |
+        cat "$OLDGCODE" |
             austerus-shift -x "$DX" -y "$DY" -z "$ZMIN" > "$GCODE"
 
         if [ "$?" -ne 0 ]
@@ -50,9 +60,12 @@ case "$RC" in
             exit 1
         fi
 
-        plan $SPOOL_DIR/$DATAFILES
+	echo "gcodea=$GCODE"
+        plan "$GCODE"
 
-        if [ "$?" -ne 0 ]
+        echo "replan=$PLANRC"
+
+        if [ "$PLANRC" -ne 0 ]
         then
             echo "shift replan failed"
             exit 1
@@ -62,19 +75,27 @@ case "$RC" in
         exit 2
 esac
 
-DEPFILE=`mktemp --tmpdir="$SPOOL_DIR/matterq/depositions"`
+echo "gcode=$GCODE"
+
+DEPFILE=`mktemp --tmpdir="$MQ_SPOOLDIR/depositions"`
 austerus-verge -d -p "$GCODE" > "$DEPFILE"
 
 echo "processing gcode"
 
-austerus-send -s $GCODE
-RC=$?
+if [ "$MQ_TESTMODE" -ne 1 ]
+then
+    austerus-send -s $GCODE
+else
+    echo austerus-send -s $GCODE
+fi
+
+SENDRC=$?
 
 echo "finished"
 
 plan
 
-if [ "$RC" -eq 0 ]; then
+if [ "$SENDRC" -eq 0 ]; then
     exit 0
 else
     exit 2
