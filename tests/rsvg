@@ -1,0 +1,4 @@
+#!/bin/bash
+
+#echo rsvg-convert -o $2 $1
+exec rsvg-convert -o $2 $1
