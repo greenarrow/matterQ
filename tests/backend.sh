@@ -15,6 +15,7 @@ TEST_OUTPUT=/tmp/mqtest
 
 export PATH
 export MQ_TESTMODE
+export MQ_PLANNER_MODE
 export MQ_SPOOLDIR
 export MQ_HEADSIZE
 export MQ_PRINTBED

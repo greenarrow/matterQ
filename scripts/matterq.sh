@@ -9,6 +9,7 @@ export AG_VERBOSE
 export AG_DUMP
 
 export MQ_SPOOLDIR
+export MQ_PLANNER_MODE
 
 export MQ_HEADSIZE
 export MQ_PRINTBED
