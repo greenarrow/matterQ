@@ -288,7 +288,7 @@ def main():
         zmin = max(z, d1.get_z_safe()) + 5
 
     new_working = initial_region_zmin(args, zsafe, head, zmin)
-    assert new_working <= bed
+    #assert new_working <= bed ?
 
     new_working.draw(ctx, (0.0, 0.0, 0.8, 0.8), outline=True, label="initial working")
 
