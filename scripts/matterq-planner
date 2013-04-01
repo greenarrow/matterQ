@@ -203,6 +203,10 @@ def parse_args():
                         nargs="?",
                         help="Gcode file for which to plan printing")
 
+    parser.add_argument("--pack",
+                        action="store_true",
+                        help="Always shift print for efficient bed filling")
+
     parser.add_argument("--svg",
                         default=None,
                         type=argparse.FileType("w"),
@@ -303,7 +307,7 @@ def main():
         sys.stderr.write("collision with zsafe\n")
         valid = False
 
-    if valid:
+    if valid and not args.pack:
         if args.verbose:
             sys.stderr.write("valid as is\n")
 
