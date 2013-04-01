@@ -31,17 +31,31 @@ fi
 
 GCODE=`echo "$SPOOL_DIR/$DATAFILES" | sed 's/\s*$//g'`
 
-echo "planning print"
-
-plan $GCODE
+if [ "$MQ_PLANNER_MODE" != "none" ]
+then
+    echo "planning print"
+    plan $GCODE
+else
+    PLANRC=0
+fi
 
 echo "plan=$PLANRC"
 
 case "$PLANRC" in
     0)
+        if [ "$MQ_PLANNER_MODE" == "pack" ]
+        then
+            echo "TODO shift"
+        fi
         GCODE="$GCODE"
         ;;
     1)
+        if [ "$MQ_PLANNER_MODE" == "abort" ]
+        then
+            echo "abort"
+            exit 1
+        fi
+
         echo "preshift"
         DX=`echo "$SHIFT" | grep '^X' | awk '{print $2}'`
         DY=`echo "$SHIFT" | grep '^Y' | awk '{print $2}'`
@@ -77,8 +91,11 @@ esac
 
 echo "gcode=$GCODE"
 
-DEPFILE=`mktemp --tmpdir="$MQ_SPOOLDIR/depositions"`
-austerus-verge -d -p "$GCODE" > "$DEPFILE"
+if [ "$MQ_PLANNER_MODE" != "none" ]
+then
+    DEPFILE=`mktemp --tmpdir="$MQ_SPOOLDIR/depositions"`
+    austerus-verge -d -p "$GCODE" > "$DEPFILE"
+fi
 
 echo "processing gcode"
 
@@ -93,7 +110,10 @@ SENDRC=$?
 
 echo "finished"
 
-plan
+if [ "$MQ_PLANNER_MODE" != "none" ]
+then
+    plan
+fi
 
 if [ "$SENDRC" -eq 0 ]; then
     exit 0
