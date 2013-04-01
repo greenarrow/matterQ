@@ -332,7 +332,13 @@ def main():
     # Detect any conflicts
     shift = None
 
+    padding = Clearance(5, 5, 5, 5)
+    #padding = Clearance(10, 10, 10, 10)
+    #padding = Clearance(1, 1, 1, 1)
 
+    # still discrepency between first plan and shift and replan very  often, confusing.
+
+    sys.stderr.write(str((head.x1 > head.x2, head.y1 > head.y2)))
     dx = head.x1 > head.x2 and -1 or 1
     dy = head.y1 > head.y2 and -1 or 1
     for x in range(-dx * int(bedsize[0]), dx * int(bedsize[0]), dx * 5):
@@ -343,7 +349,7 @@ def main():
             new_deposition.shift(x, y)
 
             if (new_deposition + Clearance(5, 5, 5, 5)) <= bed:
-                if not detect_collisions(depositions, new_deposition + head) and \
+                if not detect_collisions(depositions, new_deposition + head + padding) and \
                    not new_deposition & (zsafe + head):
                     shift = x, y
                     break
