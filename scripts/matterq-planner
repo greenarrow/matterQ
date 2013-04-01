@@ -342,6 +342,8 @@ def main():
     sys.stderr.write(str((head.x1 > head.x2, head.y1 > head.y2)))
     dx = head.x1 > head.x2 and -1 or 1
     dy = head.y1 > head.y2 and -1 or 1
+    # TODO try first in directoion for head bounds efficienct...
+    # also shift on most versatile axis in preference?
     for x in range(-dx * int(bedsize[0]), dx * int(bedsize[0]), dx * 5):
         if shift is not None:
             break
