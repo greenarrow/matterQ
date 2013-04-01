@@ -143,6 +143,7 @@ def detect_collisions(depositions, new):
                 assert True
 
         if d1 & new:
+            #sys.stderr.write("conflict: %s & %s\n" % (d1, new))
             return True
 
     return False
