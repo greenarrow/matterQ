@@ -1,0 +1,25 @@
+stef@adjuster:~/src/matterQ/tests$ austerus-verge -p -i "-93:18:-18:49" -z 13.7 /tmp/tmp.MnRGlLxQhh
+out of z
+out of z
+out of z
+out of z
+out of z
+out of z
+X	75.000000	192.300003
+Y	0.000000	124.680000
+Z	13.700000	28.700001
+
+
+This should not be 0!
+Should be more like:
+
+stef@adjuster:~/src/matterQ/tests$ austerus-verge -dp /tmp/tmp.MnRGlLxQhh
+X	156.899994	192.300003
+Y	74.519997	124.680000
+Z	14.240001	22.399986
+E	0.000000	296.679260
+
+
+
+with the ignore patch, we should check that x,y delta or z delta or something
+to ensure we are not on a un-known zslope
