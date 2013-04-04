@@ -68,12 +68,14 @@ case "$PLANRC" in
 
         echo "shift"
 
-        DX=`echo "$SHIFT" | grep '^X' | awk '{print $2}'`
-        DY=`echo "$SHIFT" | grep '^Y' | awk '{print $2}'`
+        DX=`echo "$SHIFT" | grep '^DX' | awk '{print $2}'`
+        DY=`echo "$SHIFT" | grep '^DY' | awk '{print $2}'`
         set +e
         ZMIN=10
-        ZMIN=`echo "$SHIFT" | grep '^Z' | awk '{print $2}'`
+        ZMIN=`echo "$SHIFT" | grep '^ZMIN' | awk '{print $2}'`
         set -e
+        SX=`echo "$SHIFT" | grep '^SX' | awk '{print $2}'`
+        SY=`echo "$SHIFT" | grep '^SY' | awk '{print $2}'`
 
         OLDGCODE="$GCODE"
         GCODE=`mktemp`
@@ -84,7 +86,7 @@ case "$PLANRC" in
         fi
 
         cat "$OLDGCODE" |
-            austerus-shift -x "$DX" -y "$DY" -z "$ZMIN" > "$GCODE"
+            austerus-shift -x "$DX" -y "$DY" -z "$ZMIN" -a "$SX" -b "$SY" > "$GCODE"
 
         if [ "$?" -ne 0 ]
         then
