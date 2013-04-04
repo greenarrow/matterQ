@@ -373,11 +373,16 @@ def main():
     if args.verbose:
         sys.stderr.write("shifted: %s\n" % repr(new_deposition))
 
-    print "X\t%f" % shift[0]
-    print "Y\t%f" % shift[1]
+    print "DX\t%f" % shift[0]
+    print "DY\t%f" % shift[1]
 
     if zmin is not None:
-        print "Z\t%f" % zmin
+        print "ZMIN\t%f" % zmin
+
+    print "SX\t%f" % (new_deposition.x1
+                      + ((new_deposition.x2 - new_deposition.x1) / 2))
+    print "SY\t%f" % (new_deposition.y1
+                      + ((new_deposition.y2 - new_deposition.y1) / 2))
 
     if args.svg is not None:
         surface.finish()
