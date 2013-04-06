@@ -6,8 +6,13 @@ set -o pipefail
 
 plan()
 {
+    if [ "$MQ_TESTMODE" -eq 1 ]
+    then
+        echo matterq-planner --verbose $2 --svg $MQ_SPOOLDIR/images/current.svg $1
+    fi
+
     set +e
-    SHIFT=`matterq-planner --verbose --svg $MQ_SPOOLDIR/images/current.svg $1`
+    SHIFT=`matterq-planner --verbose $2 --svg $MQ_SPOOLDIR/images/current.svg $1`
     PLANRC=$?
     set -e
 
@@ -31,15 +36,20 @@ fi
 
 GCODE=`echo "$SPOOL_DIR/$DATAFILES" | sed 's/\s*$//g'`
 
+PARGS=""
+
+if [ "$MQ_PLANNER_MODE" == "pack" ]
+then
+    PARGS="$PARGS --pack"
+fi
+
 if [ "$MQ_PLANNER_MODE" != "none" ]
 then
     echo "planning print"
-    plan $GCODE
+    plan $GCODE $PARGS
 else
     PLANRC=0
 fi
-
-echo "plan=$PLANRC"
 
 case "$PLANRC" in
     0)
@@ -56,15 +66,23 @@ case "$PLANRC" in
             exit 1
         fi
 
-        echo "preshift"
+        echo "shift"
+
         DX=`echo "$SHIFT" | grep '^X' | awk '{print $2}'`
         DY=`echo "$SHIFT" | grep '^Y' | awk '{print $2}'`
+        set +e
+        ZMIN=10
         ZMIN=`echo "$SHIFT" | grep '^Z' | awk '{print $2}'`
+        set -e
 
-	echo "shift"
-
-	OLDGCODE="$GCODE"
+        OLDGCODE="$GCODE"
         GCODE=`mktemp`
+
+        if [ "$MQ_TESTMODE" -eq 1 ]
+        then
+            echo austerus-shift -x "$DX" -y "$DY" -z "$ZMIN" -a "$SX" -b "$SY"
+        fi
+
         cat "$OLDGCODE" |
             austerus-shift -x "$DX" -y "$DY" -z "$ZMIN" > "$GCODE"
 
@@ -74,10 +92,7 @@ case "$PLANRC" in
             exit 1
         fi
 
-	echo "gcodea=$GCODE"
         plan "$GCODE"
-
-        echo "replan=$PLANRC"
 
         if [ "$PLANRC" -ne 0 ]
         then
@@ -89,7 +104,10 @@ case "$PLANRC" in
         exit 2
 esac
 
-echo "gcode=$GCODE"
+if [ "$MQ_TESTMODE" -eq 1 ]
+then
+    echo "gcode=$GCODE"
+fi
 
 if [ "$MQ_PLANNER_MODE" != "none" ]
 then
