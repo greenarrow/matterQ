@@ -82,11 +82,11 @@ case "$PLANRC" in
 
         if [ "$MQ_TESTMODE" -eq 1 ]
         then
-            echo austerus-shift -x "$DX" -y "$DY" -z "$ZMIN" -a "$SX" -b "$SY"
+            echo austerus-shift -x "$DX" -y "$DY" -z `echo "$ZMIN + 1" | bc` -a "$SX" -b "$SY"
         fi
 
         cat "$OLDGCODE" |
-            austerus-shift -x "$DX" -y "$DY" -z "$ZMIN" -a "$SX" -b "$SY" > "$GCODE"
+            austerus-shift -x "$DX" -y "$DY" -z `echo "$ZMIN + 1" | bc` -a "$SX" -b "$SY" > "$GCODE"
 
         if [ "$?" -ne 0 ]
         then
