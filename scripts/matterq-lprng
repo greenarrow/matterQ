@@ -70,10 +70,16 @@ case "$PLANRC" in
 
         DX=`echo "$SHIFT" | grep '^DX' | awk '{print $2}'`
         DY=`echo "$SHIFT" | grep '^DY' | awk '{print $2}'`
+
         set +e
-        ZMIN=10
         ZMIN=`echo "$SHIFT" | grep '^ZMIN' | awk '{print $2}'`
         set -e
+
+        if [ -z "$ZMIN" ]
+        then
+            ZMIN=10
+        fi
+
         SX=`echo "$SHIFT" | grep '^SX' | awk '{print $2}'`
         SY=`echo "$SHIFT" | grep '^SY' | awk '{print $2}'`
 
