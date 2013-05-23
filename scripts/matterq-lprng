@@ -55,10 +55,6 @@ fi
 
 case "$PLANRC" in
     0)
-        if [ "$MQ_PLANNER_MODE" == "pack" ]
-        then
-            echo "TODO shift"
-        fi
         GCODE="$GCODE"
         ;;
     1)
@@ -68,7 +64,7 @@ case "$PLANRC" in
             exit 1
         fi
 
-        echo "shift"
+        echo "shifting print"
 
         DX=`echo "$SHIFT" | grep '^DX' | awk '{print $2}'`
         DY=`echo "$SHIFT" | grep '^DY' | awk '{print $2}'`
