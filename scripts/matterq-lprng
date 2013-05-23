@@ -8,11 +8,13 @@ plan()
 {
     if [ "$MQ_TESTMODE" -eq 1 ]
     then
-        echo matterq-planner --verbose $2 --svg $MQ_SPOOLDIR/images/current.svg $1
+        echo matterq-planner --verbose $2 \
+             --svg $MQ_SPOOLDIR/images/current.svg $1
     fi
 
     set +e
-    SHIFT=`matterq-planner --verbose $2 --svg $MQ_SPOOLDIR/images/current.svg $1`
+    SHIFT=`matterq-planner --verbose $2 --svg \
+                           $MQ_SPOOLDIR/images/current.svg $1`
     PLANRC=$?
     set -e
 
@@ -89,11 +91,13 @@ case "$PLANRC" in
 
         if [ "$MQ_TESTMODE" -eq 1 ]
         then
-            echo cat "$OLDGCODE" austerus-shift -x "$DX" -y "$DY" -z "$ZSAFE" -a "$SX" -b "$SY"
+            echo cat "$OLDGCODE" austerus-shift -x "$DX" -y "$DY" -z "$ZSAFE" \
+                 -a "$SX" -b "$SY"
         fi
 
         cat "$OLDGCODE" |
-            austerus-shift -x "$DX" -y "$DY" -z "$ZSAFE" -a "$SX" -b "$SY" > "$GCODE"
+            austerus-shift -x "$DX" -y "$DY" -z "$ZSAFE" -a "$SX" -b "$SY" > \
+                           "$GCODE"
 
         if [ "$?" -ne 0 ]
         then
