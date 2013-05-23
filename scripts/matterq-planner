@@ -317,24 +317,12 @@ def main():
 
         sys.exit(0)
 
-    """
-    # bring back?
-    if detect_collisions(depositions, zsafe + head):
-        if args.verbose:
-            sys.stderr.write("Z reset conflict error\n")
-
-        if args.svg is not None:
-            surface.finish()
-
-        sys.exit(2)
-    """
-
     # Detect any conflicts
     shift = None
 
-
     dx = head.x1 > head.x2 and -1 or 1
     dy = head.y1 > head.y2 and -1 or 1
+
     for x in range(-dx * int(bedsize[0]), dx * int(bedsize[0]), dx * 5):
         if shift is not None:
             break
