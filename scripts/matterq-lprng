@@ -20,8 +20,6 @@ plan()
 
     rsvg $MQ_SPOOLDIR/images/current.svg \
          $MQ_SPOOLDIR/images/current.png
-    chmod 0666 $MQ_SPOOLDIR/images/current.svg
-    chmod 0666 $MQ_SPOOLDIR/images/current.png
 }
 
 
