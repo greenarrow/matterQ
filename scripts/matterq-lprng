@@ -8,12 +8,12 @@ plan()
 {
     if [ "$MQ_TESTMODE" -eq 1 ]
     then
-        echo matterq-planner --verbose $2 \
+        echo matterq-planner $VERBOSE_FLAG $2 \
              --svg $MQ_SPOOLDIR/images/current.svg $1
     fi
 
     set +e
-    SHIFT=`matterq-planner --verbose $2 --svg \
+    SHIFT=`matterq-planner $VERBOSE_FLAG $2 --svg \
                            $MQ_SPOOLDIR/images/current.svg $1`
     PLANRC=$?
     set -e
@@ -31,9 +31,14 @@ plan()
 #    exit 2
 #fi
 
+MQ_TESTMODE=0
+
 if [ "$MQ_TESTMODE" -ne 1 ]
 then
     source /etc/profile.d/matterq.sh
+else
+    echo "TEST MODE"
+    VERBOSE_FLAG="--verbose"
 fi
 
 GCODE=`echo "$SPOOL_DIR/$DATAFILES" | sed 's/\s*$//g'`
