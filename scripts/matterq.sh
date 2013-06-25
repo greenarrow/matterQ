@@ -14,3 +14,4 @@ export MQ_PLANNER_MODE
 export MQ_HEADSIZE
 export MQ_PRINTBED
 
+export MQ_DEBUG
