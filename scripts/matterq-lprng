@@ -29,6 +29,12 @@ plan()
 #    exit 2
 #fi
 
+SPOOL_DIR=`echo "$SPOOL_DIR" | sed 's#/$##g'`
+
+if [ -n "$SPOOL_DIR" ]
+then
+    SPOOL_DIR="$SPOOL_DIR/"
+fi
 
 if [ "$MQ_DEBUG" -eq 0 ]
 then
@@ -44,7 +50,7 @@ else
     echo "TEST MODE"
 fi
 
-GCODE=`echo "$SPOOL_DIR/$DATAFILES" | sed 's/\s*$//g'`
+GCODE=`echo "$SPOOL_DIR$DATAFILES" | sed 's/\s*$//g'`
 
 PARGS=""
 
