@@ -41,8 +41,6 @@ then
     VERBOSE_FLAG="--verbose"
 fi
 
-MQ_TESTMODE=0
-
 if [ "$MQ_TESTMODE" -ne 1 ]
 then
     source /etc/profile.d/matterq.sh

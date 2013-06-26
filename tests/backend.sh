@@ -7,6 +7,7 @@ source ../config/matterq.conf
 
 PATH=../scripts:$PATH:.
 MQ_TESTMODE=1
+MQ_DEBUG=1
 MQ_SPOOLDIR=/tmp/spoolmq
 #SPOOL_DIR=/tmp/spoollpr
 SPOOL_DIR=""
@@ -19,6 +20,7 @@ export MQ_PLANNER_MODE
 export MQ_SPOOLDIR
 export MQ_HEADSIZE
 export MQ_PRINTBED
+export MQ_DEBUG
 export SPOOL_DIR
 
 #mkdir -p $SPOOL_DIR
