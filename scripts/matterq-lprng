@@ -6,7 +6,7 @@ set -o pipefail
 
 plan()
 {
-    if [ "$MQ_TESTMODE" -eq 1 ]
+    if [ "$MQ_TESTMODE" == "1" ]
     then
         echo matterq-planner $VERBOSE_FLAG $2 \
              --svg $MQ_SPOOLDIR/images/current.svg $1
@@ -29,6 +29,9 @@ plan()
 #    exit 2
 #fi
 
+MQ_TESTMODE=${MQ_TESTMODE-0}
+MQ_DEBUG=${MQ_DEBUG-0}
+
 SPOOL_DIR=`echo "$SPOOL_DIR" | sed 's#/$##g'`
 
 if [ -n "$SPOOL_DIR" ]
@@ -36,16 +39,16 @@ then
     SPOOL_DIR="$SPOOL_DIR/"
 fi
 
-if [ "$MQ_DEBUG" -eq 0 ]
+if [ "$MQ_DEBUG" == "1" ]
 then
     VERBOSE_FLAG="--verbose"
 fi
 
-if [ "$MQ_TESTMODE" -ne 1 ]
+if [ "$MQ_TESTMODE" == "1" ]
 then
-    source /etc/profile.d/matterq.sh
-else
     echo "TEST MODE"
+else
+    source /etc/profile.d/matterq.sh
 fi
 
 GCODE=`echo "$SPOOL_DIR$DATAFILES" | sed 's/\s*$//g'`
@@ -97,7 +100,7 @@ case "$PLANRC" in
         GCODE=`mktemp`
         ZSAFE=`echo "$ZMIN + 1" | bc`
 
-        if [ "$MQ_TESTMODE" -eq 1 ]
+        if [ "$MQ_TESTMODE" == "1" ]
         then
             echo cat "$OLDGCODE" austerus-shift -x "$DX" -y "$DY" -z "$ZSAFE" \
                  -a "$SX" -b "$SY"
@@ -125,7 +128,7 @@ case "$PLANRC" in
         exit 2
 esac
 
-if [ "$MQ_TESTMODE" -eq 1 ]
+if [ "$MQ_TESTMODE" == "1" ]
 then
     echo "gcode=$GCODE"
 fi
@@ -138,11 +141,11 @@ fi
 
 echo "processing gcode"
 
-if [ "$MQ_TESTMODE" -ne 1 ]
+if [ "$MQ_TESTMODE" == "1" ]
 then
-    austerus-send -s $GCODE
-else
     echo austerus-send -s $GCODE
+else
+    austerus-send -s $GCODE
 fi
 
 SENDRC=$?
