@@ -29,6 +29,8 @@ filter:
 		$(DESTDIR)$(EXEDIR)/filters
 	$(INSTALL) -m 0755 scripts/matterq-planner \
 		$(DESTDIR)$(BINDIR)
+	$(INSTALL) -m 0755 scripts/matterq-detect-printers \
+		$(DESTDIR)$(BINDIR)
 	$(INSTALL) -m 0755 scripts/matterq-plate-render \
 		$(DESTDIR)$(BINDIR)
 

@@ -1,0 +1,125 @@
+#!/usr/bin/env python
+
+import os
+import re
+import sys
+import subprocess
+
+
+def question(text, default=None, options=None, type=None, retry=True):
+    if options is not None and len(options):
+        opts = []
+
+        for i, v in enumerate(options):
+            if v == default:
+                opts.append(str(v).upper())
+            else:
+                opts.append(str(v).lower())
+
+        reply = raw_input("%s [%s]: " % (text, "/".join(opts)))
+
+    elif default is not None:
+        reply = raw_input("%s [%s]: " % (text, str(default)))
+
+    else:
+        reply = raw_input("%s: " % text)
+
+    if len(reply) == 0:
+        reply = default
+
+    elif type is not None:
+        reply = type(reply)
+
+    if options is None:
+        return reply
+
+    for value in options:
+        if reply is None and None not in options:
+            break
+
+        if reply.lower() == value.lower():
+            return reply
+
+    if retry:
+        return question(text, default, options, type, retry)
+
+    raise ValueError("invalid choice")
+
+
+def get_rule(serial, name):
+    return 'SUBSYSTEMS=="usb", ATTRS{serial}=="%s", SYMLINK+="%s"' % (serial,
+                                                                      name)
+
+
+if __name__ == "__main__":
+    re_device = re.compile(r"^Bus \d+ Device \d+")
+    re_serial = re.compile(r"iSerial\s+[0-9\.x]+\s+(.+)")
+
+    if os.geteuid() != 0:
+        sys.stderr.write("must be root!\n")
+        sys.exit(1)
+
+    p = subprocess.Popen(["lsusb", "-v"], stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    out, err = p.communicate()
+
+    sections = []
+    for line in out.split("\n"):
+        if re_device.match(line) is not None:
+            sections.append([])
+
+        if len(sections):
+            sections[-1].append(line)
+
+    rules = []
+
+    for section in sections:
+        print section[0]
+
+        if question("add this device?", default="n", options="yn") != "y":
+            print
+            continue
+
+        serial = None
+
+        for line in section:
+            result = re_serial.findall(line)
+
+            if len(result) == 0:
+                continue
+
+            serial = result[0].strip()
+
+        assert serial is not None
+
+        device = question("enter device name to use",
+                          default="arduino%d" % len(rules))
+
+        rule = get_rule(serial, device)
+        rules.append(rule)
+        print "rule:"
+        print rule
+        print
+
+    if len(rules) == 0:
+        sys.exit(0)
+
+    if question("write udev rules files?", default="y", options="yn") != "y":
+        sys.exit(0)
+
+    filename = "/etc/udev/rules.d/10-matterq.rules"
+
+    if (os.path.exists(filename)):
+        if question("overwrite %s ?" % filename, default="n",
+                    options="yn") != "y":
+            sys.exit(1)
+
+    f = open(filename, "w")
+
+    for rule in rules:
+        f.write(rule)
+        f.write("\n")
+
+    f.close()
+
+    print "written rules to %s" % filename
