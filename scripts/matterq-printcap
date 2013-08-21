@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import pipes
+
+
+if __name__ == "__main__":
+    for line in os.environ["PRINTCAP_ENTRY"].split("\n"):
+        line = line.strip()
+
+        if len(line) == 0 or line.startswith("#"):
+            continue
+
+        if line.startswith(":"):
+            line = line.lstrip(":")
+            parts = line.split("=")
+
+            if parts[0].startswith("MQ_") or parts[0].startswith("AG_"):
+                sys.stdout.write(parts[0])
+                sys.stdout.write("=")
+                sys.stdout.write(pipes.quote(parts[1].replace("\:", ":")))
+                sys.stdout.write(" ")
