@@ -1,0 +1,3 @@
+[submodule "austerusG"]
+	path = austerusG
+	url = https://github.com/greenarrow/austerusG.git
