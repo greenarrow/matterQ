@@ -53,6 +53,8 @@ web:
 	$(INSTALL) -m 0644 web/media/images/logo64.png $(DESTDIR)$(VARDIR)/www/media/images
 	$(INSTALL) -m 0644 web/media/images/tick32.png $(DESTDIR)$(VARDIR)/www/media/images
 	$(INSTALL) -m 0644 web/media/images/stop32.png $(DESTDIR)$(VARDIR)/www/media/images
+	$(INSTALL) -m 0666 web/media/images/current.svg $(DESTDIR)$(VARDIR)/spool/matterq/lp/images
+	$(INSTALL) -m 0666 web/media/images/current.png $(DESTDIR)$(VARDIR)/spool/matterq/lp/images
 
 sysconfig:
 	# System configuration
