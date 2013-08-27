@@ -54,7 +54,7 @@ fi
 PRINTCAP_ENV=`matterq-printcap`
 if [ -n "$PRINTCAP_ENV" ]
 then
-    export "$PRINTCAP_ENV"
+    export $PRINTCAP_ENV
 fi
 
 GCODE=`echo "$SPOOL_DIR$DATAFILES" | sed 's/\s*$//g'`
