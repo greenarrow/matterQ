@@ -55,7 +55,7 @@ Steps 1 to 5 are performed on the Raspberry Pi board after connecting by SSH.
 
         $ sudo make wifi
 
-3.  Install austerusG (latest stable version)
+3.  Install austerusG
 
         $ git submodule init
         $ git submodule update
