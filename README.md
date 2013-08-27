@@ -57,10 +57,9 @@ Steps 1 to 5 are performed on the Raspberry Pi board after connecting by SSH.
 
 3.  Install austerusG (latest stable version)
 
-        $ cd ~
-        $ git clone https://github.com/greenarrow/austerusG.git
+        $ git submodule init
+        $ git submodule update
         $ cd austerusG
-        $ git checkout `git describe --abbrev=0`
         $ make SETUID=1
         $ sudo make SETUID=1 install
 
