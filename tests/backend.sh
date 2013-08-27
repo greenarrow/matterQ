@@ -11,6 +11,7 @@ MQ_DEBUG=1
 MQ_SPOOLDIR=/tmp/spoolmq
 #SPOOL_DIR=/tmp/spoollpr
 SPOOL_DIR=""
+PRINTCAP_ENTRY=""
 
 TEST_OUTPUT=/tmp/mqtest
 
@@ -22,6 +23,7 @@ export MQ_HEADSIZE
 export MQ_PRINTBED
 export MQ_DEBUG
 export SPOOL_DIR
+export PRINTCAP_ENTRY
 
 #mkdir -p $SPOOL_DIR
 mkdir -p $MQ_SPOOLDIR/depositions
