@@ -23,8 +23,8 @@ into a function 3D print server.
 1.  Go to the
     [Raspberry Pi downloads page](http://www.raspberrypi.org/downloads)
     and download the following image:
- 
-        2013-02-09-wheezy-raspbian.zip
+
+        2013-07-26-wheezy-raspbian.zip
 
 3.  Write the image to an SD card following the
     [Raspberry Pi guide](http://elinux.org/RPi_Easy_SD_Card_Setup)
