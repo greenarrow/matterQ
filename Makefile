@@ -35,6 +35,10 @@ filter:
 		$(DESTDIR)$(BINDIR)
 	$(INSTALL) -m 0755 scripts/matterq-plate-render \
 		$(DESTDIR)$(BINDIR)
+	$(INSTALL) -m 0755 scripts/matterq-create-queue \
+		$(DESTDIR)$(BINDIR)
+	$(INSTALL) -m 0755 scripts/matterq-list-queues \
+		$(DESTDIR)$(BINDIR)
 
 web:
 	$(INSTALL) -d $(DESTDIR)$(VARDIR)/www

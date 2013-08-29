@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -eu
+
+if [ $# -ne 1 ]
+then
+	NAME=`basename "$0"`
+	echo "Usage: $NAME [QUEUE]"
+	exit 1
+fi
+
+install -o daemon -g lp -d -m 0755 /var/spool/matterq/$1
+install -o daemon -g lp -d -m 0777 /var/spool/matterq/$1/depositions
+install -o daemon -g lp -d -m 0777 /var/spool/matterq/$1/images

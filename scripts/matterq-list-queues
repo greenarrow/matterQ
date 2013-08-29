@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -eu
+
+ls -1 /var/spool/matterq
