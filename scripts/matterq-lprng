@@ -66,6 +66,11 @@ then
     PARGS="$PARGS --pack"
 fi
 
+if [ "$MQ_PLANNER_MODE" == "abort" ]
+then
+    PARGS="$PARGS --ignore-zsafe"
+fi
+
 if [ "$MQ_PLANNER_MODE" != "none" ]
 then
     echo "planning print"
@@ -122,7 +127,7 @@ case "$PLANRC" in
             exit 1
         fi
 
-        plan "$GCODE"
+        plan "$GCODE" "--ignore-zsafe"
 
         if [ "$PLANRC" -ne 0 ]
         then
