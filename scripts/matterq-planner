@@ -207,6 +207,12 @@ def parse_args():
                         action="store_true",
                         help="Always shift print for efficient bed filling")
 
+    parser.add_argument("--ignore-zsafe",
+                        dest="zsafe",
+                        action="store_false",
+                        default=True,
+                        help="Allow printing in Z reset region (X0 Y0)")
+
     parser.add_argument("--svg",
                         default=None,
                         type=argparse.FileType("w"),
@@ -303,7 +309,7 @@ def main():
         sys.stderr.write("collision with existing\n")
         valid = False
 
-    if new_deposition & (zsafe + head):
+    if args.zsafe and new_deposition & (zsafe + head):
         sys.stderr.write("collision with zsafe\n")
         valid = False
 
@@ -332,7 +338,7 @@ def main():
 
             if (new_deposition + Clearance(5, 5, 5, 5)) <= bed:
                 if not detect_collisions(depositions, new_deposition + head) and \
-                   not new_deposition & (zsafe + head):
+                   and not (args.zsafe and new_deposition & (zsafe + head)):
                     shift = x, y
                     break
 
