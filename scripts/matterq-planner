@@ -329,6 +329,9 @@ def main():
     dx = head.x1 > head.x2 and -1 or 1
     dy = head.y1 > head.y2 and -1 or 1
 
+    blist = []
+
+    # Search for a suitable space on the print bed.
     for x in range(-dx * int(bedsize[0]), dx * int(bedsize[0]), dx * 5):
         if shift is not None:
             break
@@ -336,13 +339,19 @@ def main():
         for y in range(-dy * int(bedsize[1]), dy * int(bedsize[1]), dy * 5):
             new_deposition.shift(x, y)
 
-            if (new_deposition + Clearance(5, 5, 5, 5)) <= bed:
-                if not detect_collisions(depositions, new_deposition + head) and \
-                   and not (args.zsafe and new_deposition & (zsafe + head)):
+            if not detect_collisions(depositions, new_deposition + head) and \
+               and not (args.zsafe and new_deposition & (zsafe + head)):
+                if (new_deposition + Clearance(5, 5, 5, 5)) <= bed:
                     shift = x, y
                     break
+                elif new_deposition <= bed:
+                    blist.append((x, y))
 
             new_deposition.shift(-x, -y)
+
+    # Prefer clearance from sides of bed but don't worry if we can't have it.
+    if shift is None and len(blist):
+        shift = blist[0]
 
     if shift is None:
         if args.verbose:
