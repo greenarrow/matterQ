@@ -339,7 +339,7 @@ def main():
         for y in range(-dy * int(bedsize[1]), dy * int(bedsize[1]), dy * 5):
             new_deposition.shift(x, y)
 
-            if not detect_collisions(depositions, new_deposition + head) and \
+            if not detect_collisions(depositions, new_deposition + head) \
                and not (args.zsafe and new_deposition & (zsafe + head)):
                 if (new_deposition + Clearance(5, 5, 5, 5)) <= bed:
                     shift = x, y
