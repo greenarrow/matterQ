@@ -79,6 +79,8 @@ sysconfig:
 	usermod -a -G dialout pi
 	usermod -a -G dialout daemon
 
+	rm -f /etc/network/if-up.d/lprng
+
 install: filter web sysconfig
 
 wifi:
