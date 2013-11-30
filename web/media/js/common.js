@@ -21,7 +21,8 @@ $(document).ready(function() {
         $("#status").load("/ajax/lp/status", bind);
         $("#queue").load("/ajax/lp/queue", bind);
         d = new Date();
-        $("#plateimg").attr("src", $("#plateimg").attr("src") + "?" + d.getTime());
+        $("#plateimg").attr("src", $("#plateimg").attr("src").split("?", 1)[0]
+                                   + "?" + d.getTime());
     }
 
     $("a.clear").click(function() {
