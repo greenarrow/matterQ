@@ -1,13 +1,13 @@
 $(document).ready(function() {
     function bind() {
-        $("a.detail").click(function() {
+        $("a.detail").unbind("click").click(function() {
             $.get($(this).attr("href"), function(data) {
                 alert(data);
             });
             return false;
         });
 
-        $("a.cancel").click(function() {
+        $("a.cancel").unbind("click").click(function() {
             $.get($(this).attr("href"), function(data) {
                 reload();
                 if (data != "true")
