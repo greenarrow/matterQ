@@ -1,16 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import os
 import sys
 import subprocess
 import re
-import cgi
+import web
+import cStringIO
 
-
-DEBUG = False
-
-if DEBUG:
-    import cgitb
 
 re_job = re.compile(r"^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+(\d+)\s*(.+?)?\s*(\d+)?\s*([0-9:]+)?$")
 re_status = re.compile(r" Status: LP filter msg - '(.*?)' at ([0-9:.]+)")
@@ -96,7 +92,7 @@ def render_status(stream, form):
 
 
 def render_queue(stream, form):
-    queue = form.getvalue("queue")
+    queue = form.get("queue")
     if queue is None:
         stream.write("queue required")
         return
@@ -154,8 +150,8 @@ def render_queue(stream, form):
 
 
 def render_detail(stream, form):
-    queue = form.getvalue("queue")
-    job = form.getvalue("job")
+    queue = form.get("queue")
+    job = form.get("job")
 
     if queue is None:
         stream.write("queue required")
@@ -194,7 +190,7 @@ def render_detail(stream, form):
 
 
 def remove(stream, form):
-    job = form.getvalue("job")
+    job = form.get("job")
 
     if job is None:
         stream.write("false")
@@ -225,29 +221,41 @@ def clear_bed(stream, form):
         stream.write("false")
 
 
-if __name__ == "__main__":
-    if DEBUG:
-        cgitb.enable()
+class Index(object):
+    def GET(self):
+        form = web.input()
+        stream = cStringIO.StringIO()
 
+        try:
+            ajax = form.get("ajax")
+
+            if ajax == "status":
+                render_status(stream, form)
+
+            elif ajax == "queue":
+                render_queue(stream, form)
+
+            elif ajax == "detail":
+                render_detail(stream, form)
+
+            elif ajax == "cancel":
+                remove(stream, form)
+
+            elif ajax == "clear":
+                clear_bed(stream, form)
+
+            return stream.getvalue()
+
+        finally:
+            stream.close()
+
+
+if __name__ == "__main__":
     load_config()
 
-    stream = sys.stdout
-    stream.write("Content-type: text/html\n\n")
+    urls = (
+        '/', 'Index'
+    )
 
-    form = cgi.FieldStorage()
-
-    ajax = form.getvalue("ajax")
-    if ajax == "status":
-        render_status(stream, form)
-
-    elif ajax == "queue":
-        render_queue(stream, form)
-
-    elif ajax == "detail":
-        render_detail(stream, form)
-
-    elif ajax == "cancel":
-        remove(stream, form)
-
-    elif ajax == "clear":
-        clear_bed(stream, form)
+    app = web.application(urls, {'Index' : Index})
+    app.run()
