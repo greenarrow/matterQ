@@ -71,11 +71,11 @@ def render_status(stream, form):
 
     serial = os.environ.get("AG_SERIALPORT")
     if serial is None:
-        stream.write("<p><img src='/media/images/stop32.png'> ")
+        stream.write("<p><img src='/media/images/stop32.png' /> ")
         stream.write("Printer is not configured.</p>\n")
     else:
         if os.path.exists(serial):
-            stream.write("<p><img src='/media/images/tick32.png'>")
+            stream.write("<p><img src='/media/images/tick32.png' />")
             stream.write(" Printer is connected.</p>\n")
 
             job = read_active_job(out)
@@ -86,7 +86,7 @@ def render_status(stream, form):
 
             stream.write("<p>Status: %s</p>\n" % status)
         else:
-            stream.write("<p><img src='/media/images/stop32.png'> ")
+            stream.write("<p><img src='/media/images/stop32.png' /> ")
             stream.write(" Printer is not connected.<br />\n")
             stream.write("<i>Device: %s</i></p>\n" % serial)
 
