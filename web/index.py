@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/local/bin/nice-python
 
 import os
 import sys
