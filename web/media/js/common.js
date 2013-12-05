@@ -36,6 +36,12 @@ $(document).ready(function() {
         return false;
     });
 
+    $('#ulform').ajaxForm({
+        complete: function(xhr) {
+            alert(xhr.responseText);
+        }
+    });
+
     reload();
     window.setInterval(reload, 5000);
 });

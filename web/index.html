@@ -26,6 +26,16 @@
 						</div>
 					</div>
 					<div class="panel">
+						<h2>Upload</h2>
+						<div id="upload" class="content">
+							<form id="ulform" action="/ajax/lp/upload" method="post" enctype="multipart/form-data">
+								<input type="hidden" name="queue" value="lp" />
+								<input type="file" name="gcode" /><br />
+								<input type="submit" value="Upload" />
+							</form>
+						</div>
+					</div>
+					<div class="panel">
 						<h2>Plate</h2>
 						<div id="plate" class="content">
 							<img id="plateimg" src="media/images/spool/current.png" />
