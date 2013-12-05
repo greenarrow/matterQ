@@ -55,6 +55,7 @@ web:
 	$(INSTALL) -m 0644 web/media/js/common.js $(DESTDIR)$(VARDIR)/www/media/js
 	$(INSTALL) -m 0644 web/media/js/css3-mediaqueries.js $(DESTDIR)$(VARDIR)/www/media/js
 	$(INSTALL) -m 0644 web/media/js/jquery-1.9.1.min.js $(DESTDIR)$(VARDIR)/www/media/js
+	$(INSTALL) -m 0644 web/media/js/jquery.form.js $(DESTDIR)$(VARDIR)/www/media/js
 	$(INSTALL) -m 0644 web/media/images/logo64.png $(DESTDIR)$(VARDIR)/www/media/images
 	$(INSTALL) -m 0644 web/media/images/tick32.png $(DESTDIR)$(VARDIR)/www/media/images
 	$(INSTALL) -m 0644 web/media/images/stop32.png $(DESTDIR)$(VARDIR)/www/media/images
