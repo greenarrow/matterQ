@@ -17,7 +17,8 @@ packages:
 	# Installing system packages
 	apt-get update
 	apt-get install -y libncurses-dev wireless-tools usbutils lprng byobu \
-		lighttpd vim python-cairo librsvg2-bin bc
+		lighttpd vim python-cairo librsvg2-bin bc python-webpy \
+		python-flup
 
 filter:
 	# Installing matterQ lnrng filter
