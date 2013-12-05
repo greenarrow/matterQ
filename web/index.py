@@ -221,6 +221,30 @@ def clear_bed(stream, form):
         stream.write("false")
 
 
+def upload(stream, form):
+    data = web.input(gcode = {})
+
+    queue = form.get("queue")
+    input = data.get("gcode")
+
+    if input is None:
+        stream.write("Upload Error")
+        return
+
+    if queue is None:
+        stream.write("queue required")
+        return
+
+    p = subprocess.Popen(["lp", "-d", queue, "-t", input.filename, "-"],
+                         stdin = input.file)
+
+    if p.wait() != 0:
+        stream.write("Upload Error")
+        return
+
+    stream.write("Upload Complete")
+
+
 class Index(object):
     def GET(self):
         form = web.input()
@@ -249,13 +273,28 @@ class Index(object):
         finally:
             stream.close()
 
+    def POST(self):
+        form = web.input()
+        stream = cStringIO.StringIO()
+
+        try:
+            ajax = form.get("ajax")
+
+            if ajax == "upload":
+                upload(stream, form)
+
+            return stream.getvalue()
+
+        finally:
+            stream.close()
+
 
 if __name__ == "__main__":
     load_config()
 
     urls = (
-        '/', 'Index'
+        "/.*", "Index"
     )
 
-    app = web.application(urls, {'Index' : Index})
+    app = web.application(urls, {"Index" : Index})
     app.run()
