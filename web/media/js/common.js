@@ -36,8 +36,21 @@ $(document).ready(function() {
         return false;
     });
 
-    $('#ulform').ajaxForm({
+    $("#ulform").ajaxForm({
+        beforeSend: function() {
+            $("#ulprogress").show();
+
+            var percentVal = "0%";
+            $("#ulprogress > .bar").width(percentVal);
+            $("#ulprogress > .percent").html(percentVal);
+        },
+        uploadProgress: function(event, position, total, percentComplete) {
+            var percentVal = percentComplete + "%";
+            $("#ulprogress > .bar").width(percentVal)
+            $("#ulprogress > .percent").html(percentVal);
+        },
         complete: function(xhr) {
+            $("#ulprogress").hide();
             alert(xhr.responseText);
         }
     });
