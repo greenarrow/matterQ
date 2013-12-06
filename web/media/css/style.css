@@ -22,15 +22,13 @@ td {
 }
 
 #header {
-    margin: -20px 10px 20px -20px;
+    margin: -20px 0px 30px -20px;
     padding-left: 30px;
     padding-top: 20px;
 
-    border: 2px solid;
-    border-radius: 20px;
-    -moz-border-radius: 20px;
-
-    box-shadow: 2px 2px 2px #888888;
+    line-height: 200%;
+    background: #f0d0a8;
+    border: 1px solid #ccc;
 }
 
 #header img {
