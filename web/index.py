@@ -246,47 +246,33 @@ def upload(stream, form):
 
 
 class Index(object):
+    mapper = {
+        "status" : render_status,
+        "queue" : render_queue,
+        "detail" : render_detail,
+        "cancel" : remove,
+        "clear" : clear_bed,
+        "upload" : upload,
+    }
+
     def GET(self):
         form = web.input()
         stream = cStringIO.StringIO()
 
         try:
-            ajax = form.get("ajax")
+            handler = self.mapper.get(form.get("ajax"))
 
-            if ajax == "status":
-                render_status(stream, form)
-
-            elif ajax == "queue":
-                render_queue(stream, form)
-
-            elif ajax == "detail":
-                render_detail(stream, form)
-
-            elif ajax == "cancel":
-                remove(stream, form)
-
-            elif ajax == "clear":
-                clear_bed(stream, form)
+            if handler is None:
+                stream.write("invalid ajax call")
+            else:
+                handler(stream, form)
 
             return stream.getvalue()
 
         finally:
             stream.close()
 
-    def POST(self):
-        form = web.input()
-        stream = cStringIO.StringIO()
-
-        try:
-            ajax = form.get("ajax")
-
-            if ajax == "upload":
-                upload(stream, form)
-
-            return stream.getvalue()
-
-        finally:
-            stream.close()
+    POST = GET
 
 
 if __name__ == "__main__":
