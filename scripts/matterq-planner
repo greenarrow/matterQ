@@ -168,9 +168,11 @@ def initial_region_zmin(args, zsafe, head, zmin):
 
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 
-    assert p.wait() == 0
-    out, err = p.communicate()
+    if p.wait() != 0:
+        sys.stderr.write("Error processing gcode\n")
+        sys.exit(3)
 
+    out, err = p.communicate()
     new = Region.from_str(out)
 
     return new
@@ -186,9 +188,11 @@ def initial_region_deposition(args):
 
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 
-    assert p.wait() == 0
-    out, err = p.communicate()
+    if p.wait() != 0:
+        sys.stderr.write("Error processing gcode\n")
+        sys.exit(3)
 
+    out, err = p.communicate()
     newdep = Region.from_str(out)
 
     return newdep
@@ -226,42 +230,8 @@ def parse_args():
     return parser.parse_args()
 
 
-def main():
-    args = parse_args()
-
+def plan(args, bed):
     head = Clearance.from_str(os.environ["MQ_HEADSIZE"])
-
-    bedsize = map(float, os.environ["MQ_PRINTBED"].split(":"))
-    assert len(bedsize) == 2
-
-    bed = Region(0.0, bedsize[0], 0.0, bedsize[1])
-
-    if args.svg is not None:
-        surface = cairo.SVGSurface(args.svg, bed.x2, bed.y2)
-        ctx = cairo.Context(surface)
-
-        ctx.set_line_width(1.0)
-
-        ctx.set_source_rgb(0.6, 0.6, 0.6)
-        ctx.rectangle(0, 0, bed.x2, bed.y2)
-        ctx.fill()
-
-        # Axes
-        ctx.set_source_rgb(0, 0, 0)
-
-        ctx.move_to(5, 5)
-        ctx.line_to(45, 5)
-        ctx.stroke()
-
-        ctx.move_to(50, 5)
-        ctx.show_text("x")
-
-        ctx.move_to(5, 5)
-        ctx.line_to(5, 45)
-        ctx.stroke()
-
-        ctx.move_to(5, 50)
-        ctx.show_text("y")
 
     # Create a Region where the Z axis will be homed (X0 Y0) so that we can
     # check it is safe to do so.
@@ -281,9 +251,6 @@ def main():
             d.draw(ctx, (1.0, 0.0, 0.0, 0.8))
 
     if args.filename is None:
-        if args.svg is not None:
-            surface.finish()
-
         exit(0)
 
     # Calculate safe working Z value.
@@ -294,12 +261,18 @@ def main():
         zmin = max(z, d1.get_z_safe()) + 5
 
     new_working = initial_region_zmin(args, zsafe, head, zmin)
-    assert new_working <= bed
+
+    if not new_working <= bed:
+        sys.stderr.write("Print too large for plate\n")
+        sys.exit(3)
 
     new_working.draw(ctx, (0.0, 0.0, 0.8, 0.8), outline=True, label="initial working")
 
     new_deposition = initial_region_deposition(args)
-    assert new_deposition <= bed
+
+    if not new_deposition <= bed:
+        sys.stderr.write("Print too large for plate\n")
+        sys.exit(3)
 
     new_deposition.draw(ctx, (0.0, 0.0, 0.8, 0.8), outline=True, label="initial")
 
@@ -319,7 +292,6 @@ def main():
 
         if args.svg is not None:
             new_deposition.draw(ctx, (0.0, 0.0, 0.8, 0.8))
-            surface.finish()
 
         sys.exit(0)
 
@@ -332,11 +304,11 @@ def main():
     blist = []
 
     # Search for a suitable space on the print bed.
-    for x in range(-dx * int(bedsize[0]), dx * int(bedsize[0]), dx * 5):
+    for x in range(-dx * int(bed.x2), dx * int(bed.x2), dx * 5):
         if shift is not None:
             break
 
-        for y in range(-dy * int(bedsize[1]), dy * int(bedsize[1]), dy * 5):
+        for y in range(-dy * int(bed.y2), dy * int(bed.y2), dy * 5):
             new_deposition.shift(x, y)
 
             if not detect_collisions(depositions, new_deposition + head) \
@@ -354,12 +326,7 @@ def main():
         shift = blist[0]
 
     if shift is None:
-        if args.verbose:
-            sys.stderr.write("Not enough room on build plate\n")
-
-        if args.svg is not None:
-            surface.finish()
-
+        sys.stderr.write("Not enough room on build plate\n")
         sys.exit(2)
 
     x, y = shift
@@ -369,9 +336,6 @@ def main():
                                      label="shifted working")
         new_deposition.draw(ctx, (0.0, 0.0, 0.8, 0.6),
                             label="shifted")
-
-    if args.svg is not None:
-        surface.finish()
 
     if args.verbose:
         sys.stderr.write("shifted: %s\n" % repr(new_deposition))
@@ -387,16 +351,51 @@ def main():
     print "SY\t%f" % (new_deposition.y1
                       + ((new_deposition.y2 - new_deposition.y1) / 2))
 
-    if args.svg is not None:
-        surface.finish()
-
     sys.exit(1)
 
 
 if __name__ == "__main__":
     try:
-        main()
+        args = parse_args()
+
+        bedsize = map(float, os.environ["MQ_PRINTBED"].split(":"))
+        assert len(bedsize) == 2
+
+        bed = Region(0.0, bedsize[0], 0.0, bedsize[1])
+
+        if args.svg is not None:
+            surface = cairo.SVGSurface(args.svg, bed.x2, bed.y2)
+            ctx = cairo.Context(surface)
+
+            ctx.set_line_width(1.0)
+
+            ctx.set_source_rgb(0.6, 0.6, 0.6)
+            ctx.rectangle(0, 0, bed.x2, bed.y2)
+            ctx.fill()
+
+            # Axes
+            ctx.set_source_rgb(0, 0, 0)
+
+            ctx.move_to(5, 5)
+            ctx.line_to(45, 5)
+            ctx.stroke()
+
+            ctx.move_to(50, 5)
+            ctx.show_text("x")
+
+            ctx.move_to(5, 5)
+            ctx.line_to(5, 45)
+            ctx.stroke()
+
+            ctx.move_to(5, 50)
+            ctx.show_text("y")
+
+        plan(args, bed)
+
     except AssertionError:
         traceback.print_exc()
         sys.exit(3)
 
+    finally:
+        if args.svg is not None:
+            surface.finish()
