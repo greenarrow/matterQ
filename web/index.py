@@ -209,16 +209,12 @@ def clear_bed(stream, form):
     cleared = False
 
     for name in os.listdir(path):
-        cleared = True
         os.remove(os.path.join(path, name))
 
     subprocess.Popen(["/usr/local/bin/matterq-plate-render"]).wait()
     subprocess.Popen(["/usr/sbin/lpc", "release", "lp", "all"]).wait()
 
-    if cleared:
-        stream.write("true")
-    else:
-        stream.write("false")
+    stream.write("true")
 
 
 def upload(stream, form):
