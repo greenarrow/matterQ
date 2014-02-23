@@ -96,10 +96,18 @@ wifi:
 		$(DESTDIR)$(ETCDIR)/wpa_supplicant/wpa_supplicant.conf
 
 imageprune:
-	apt-get remove -y x11-common desktop-base gnome-icon-theme \
+	apt-get purge -y x11-common desktop-base gnome-icon-theme \
 		gnome-themes-standard gpicview python3 lxde-common \
 		lxde-icon-theme ttf-freefont fonts-freefont-ttf \
+		midori lxde python3-minimal lxde-icon-theme omxplayer \
+		x11-common x11-utils x11-xkb-utils dbus-x11 xkb-data \
+		fonts-freefont-ttf libx11-xcb1 libasound2 \
 		ssh openssh-blacklist openssh-blacklist-extra openssh-client \
+		openssh-server java-common penguinspuzzle \
+		python-egenix* \
+		xserver.* xarchiver xauth xkb-data console-setup xinit \
+		lightdm lxde.* python-tk python3-tk scratch \
+		openbox libxt.* lxpanel gnome.* libqt.* gvfs.* xdg-.* desktop.*
 	apt-get autoremove -y
 	apt-get clean
 
