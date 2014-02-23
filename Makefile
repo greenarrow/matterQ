@@ -18,7 +18,7 @@ packages:
 	apt-get update
 	apt-get install -y libncurses-dev wireless-tools usbutils lprng byobu \
 		lighttpd vim python-cairo librsvg2-bin bc python-webpy \
-		python-flup
+		python-flup dropbear
 
 filter:
 	# Installing matterQ lnrng filter
@@ -72,6 +72,7 @@ sysconfig:
 	$(INSTALL) -m 0644 config/lpd.conf $(DESTDIR)$(ETCDIR)/lprng
 	$(INSTALL) -m 0644 config/lpd.perms $(DESTDIR)$(ETCDIR)/lprng
 	$(INSTALL) -m 0755 config/lighttpd.conf $(DESTDIR)$(ETCDIR)/lighttpd
+	$(INSTALL) -m 0644 config/dropbear $(DESTDIR)$(ETCDIR)/default/dropbear
 	$(INSTALL) -m 0644 config/config.txt $(DESTDIR)$(BOOTDIR)
 	$(INSTALL) -m 0644 config/matterq.conf $(DESTDIR)$(BOOTDIR)
 	$(INSTALL) -m 0755 scripts/matterq.sh $(DESTDIR)$(ETCDIR)/profile.d
@@ -97,7 +98,8 @@ wifi:
 imageprune:
 	apt-get remove -y x11-common desktop-base gnome-icon-theme \
 		gnome-themes-standard gpicview python3 lxde-common \
-		lxde-icon-theme ttf-freefont fonts-freefont-ttf
+		lxde-icon-theme ttf-freefont fonts-freefont-ttf \
+		ssh openssh-blacklist openssh-blacklist-extra openssh-client \
 	apt-get autoremove -y
 	apt-get clean
 
