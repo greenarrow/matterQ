@@ -24,7 +24,7 @@ into a function 3D print server.
     [Raspberry Pi downloads page](http://www.raspberrypi.org/downloads)
     and download the following image:
 
-        2013-07-26-wheezy-raspbian.zip
+        2014-01-07-wheezy-raspbian.zip
 
 3.  Write the image to an SD card following the
     [Raspberry Pi guide](http://elinux.org/RPi_Easy_SD_Card_Setup)
@@ -85,7 +85,7 @@ Steps 1 to 5 are performed on the Raspberry Pi board after connecting by SSH.
 
         $ umount /dev/sdxx1
         $ umount /dev/sdxx2
-        $ sudo dd if=/dev/sdxx of=FILENAME.img count=3788800
+        $ sudo dd if=/dev/sdxx of=FILENAME.img count=5785600
         $ sudo mkdir -p /mnt/tmp
         $ sudo sync
         $ sudo mount -o loop,offset=$((512*122880)) FILENAME.img /mnt/tmp
