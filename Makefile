@@ -124,6 +124,7 @@ imageclean:
 	mkswap /var/swap
 
 	find /var/log -type f | xargs rm
-
+	rm -rf /var/backups/* /var/lib/apt/lists/*
 	rm -f $(PIHOME)/.bash_history
 
+	cp /dev/null /etc/resolv.conf
