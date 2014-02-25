@@ -40,6 +40,8 @@ filter:
 		$(DESTDIR)$(BINDIR)
 	$(INSTALL) -m 0755 scripts/matterq-list-queues \
 		$(DESTDIR)$(BINDIR)
+	$(INSTALL) -m 0755 scripts/matterq-log \
+		$(DESTDIR)$(BINDIR)
 
 web:
 	$(INSTALL) -d $(DESTDIR)$(VARDIR)/www

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -eu
+
+lpq -llll | sed -r \
+	-e '/^ Status: LP filter msg/!d' \
+	-e 's/ Status: LP filter msg - .(.*). at (.*)/\2: \1/'
