@@ -20,6 +20,7 @@ $(document).ready(function() {
     function reload() {
         $("#status").load("/ajax/lp/status", bind);
         $("#queue").load("/ajax/lp/queue", bind);
+        $("#log").load("/ajax/lp/log", bind);
         d = new Date();
         $("#plateimg").attr("src", $("#plateimg").attr("src").split("?", 1)[0]
                                    + "?" + d.getTime());

@@ -189,6 +189,17 @@ def render_detail(stream, form):
         stream.write("%s: %s\n" % (titles[i], items[i]))
 
 
+def render_log(stream, form):
+    p = subprocess.Popen(["/usr/local/bin/matterq-log"],
+                         stdout=subprocess.PIPE)
+    assert p.wait() == 0
+    out = p.communicate()[0]
+
+    for line in out.split("\n"):
+        stream.write(line)
+        stream.write("<br />")
+
+
 def remove(stream, form):
     job = form.get("job")
 
@@ -246,6 +257,7 @@ class Index(object):
         "status" : render_status,
         "queue" : render_queue,
         "detail" : render_detail,
+        "log" : render_log,
         "cancel" : remove,
         "clear" : clear_bed,
         "upload" : upload,
