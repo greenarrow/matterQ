@@ -80,6 +80,7 @@ sysconfig:
 	$(INSTALL) -m 0755 scripts/matterq.sh $(DESTDIR)$(ETCDIR)/profile.d
 
 	ln -sf $(DESTDIR)$(BOOTDIR)/matterq.conf $(DESTDIR)$(ETCDIR)
+	ln -sf /usr/bin/dbclient /usr/bin/ssh
 
 	usermod -a -G dialout pi
 	usermod -a -G dialout daemon
