@@ -37,6 +37,15 @@ $(document).ready(function() {
         return false;
     });
 
+    $("div.menu > select").change(function() {
+        if (confirm("Are you sure you want to " +
+                    $(this).val() + "?") == true) {
+            $.get("/ajax/menu/" + $(this).val());
+        }
+
+        $(this).val("");
+    });
+
     $("#ulform").ajaxForm({
         beforeSend: function() {
             $("#ulprogress").show();

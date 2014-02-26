@@ -39,6 +39,12 @@ td {
     display: inline;
 }
 
+.menu {
+    margin-top: -50px;
+    margin-right: 10px;
+    float: right;
+}
+
 .panel {
     margin-bottom: 20px;
     padding: 10px;

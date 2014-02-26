@@ -206,6 +206,25 @@ def render_log(stream, form):
         stream.write("<br />")
 
 
+def menu(stream, form):
+    action = form.get("action")
+
+    if action is None:
+        stream.write("invalid action")
+
+    if action == "shutdown":
+        p = subprocess.Popen(["/usr/bin/sudo",  "/sbin/poweroff"],
+                             stdout=subprocess.PIPE)
+        assert p.wait() == 0
+
+    elif action == "restart":
+        p = subprocess.Popen(["/usr/bin/sudo", "/sbin/reboot"],
+                             stdout=subprocess.PIPE)
+        assert p.wait() == 0
+    else:
+        stream.write("invalid action")
+
+
 def remove(stream, form):
     job = form.get("job")
 
@@ -264,6 +283,7 @@ class Index(object):
         "queue" : render_queue,
         "detail" : render_detail,
         "log" : render_log,
+        "menu" : menu,
         "cancel" : remove,
         "clear" : clear_bed,
         "upload" : upload,
