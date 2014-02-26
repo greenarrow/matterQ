@@ -2,6 +2,13 @@
 
 set -eu
 
-lpq -llll | sed -r \
+CMD="lpq -llll"
+
+if [ $# -gt 0 ]
+then
+	CMD="${CMD} -P ${1}"
+fi
+
+${CMD} | sed -r \
 	-e '/^ Status: LP filter msg/!d' \
 	-e 's/ Status: LP filter msg - .(.*). at (.*)/\2: \1/'

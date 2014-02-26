@@ -190,7 +190,13 @@ def render_detail(stream, form):
 
 
 def render_log(stream, form):
-    p = subprocess.Popen(["/usr/local/bin/matterq-log"],
+    queue = form.get("queue")
+
+    if queue is None:
+        stream.write("queue required")
+        return
+
+    p = subprocess.Popen(["/usr/local/bin/matterq-log", queue],
                          stdout=subprocess.PIPE)
     assert p.wait() == 0
     out = p.communicate()[0]
