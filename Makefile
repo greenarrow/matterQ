@@ -75,6 +75,7 @@ sysconfig:
 	$(INSTALL) -m 0644 config/lpd.perms $(DESTDIR)$(ETCDIR)/lprng
 	$(INSTALL) -m 0755 config/lighttpd.conf $(DESTDIR)$(ETCDIR)/lighttpd
 	$(INSTALL) -m 0644 config/dropbear $(DESTDIR)$(ETCDIR)/default/dropbear
+	$(INSTALL) -m 0440 config/matterqsu $(DESTDIR)$(ETCDIR)/sudoers.d
 	$(INSTALL) -m 0644 config/config.txt $(DESTDIR)$(BOOTDIR)
 	$(INSTALL) -m 0644 config/matterq.conf $(DESTDIR)$(BOOTDIR)
 	$(INSTALL) -m 0755 scripts/matterq.sh $(DESTDIR)$(ETCDIR)/profile.d
