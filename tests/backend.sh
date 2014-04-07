@@ -2,10 +2,12 @@
 
 set -e
 
-source ../config/matterq.conf
+REPO=`git rev-parse --show-toplevel`
 
+source "${REPO}/config/matterq.conf"
 
-PATH=../scripts:$PATH:.
+PATH="${REPO}/scripts:${REPO}/austerusG:${PATH}"
+
 MQ_TESTMODE=1
 MQ_DEBUG=1
 MQ_SPOOLDIR=/tmp/spoolmq
